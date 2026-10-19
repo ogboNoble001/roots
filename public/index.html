@@ -4,9 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roots — Clinical Lifestyle Intelligence</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
   <style>
     /* Bundled Local New York Serif */
     @font-face {
@@ -43,17 +40,18 @@
     }
 
     :root {
-      --bg-cream: #F7F4EC;
-      --bg-sidebar: #FAF8F3;
-      --surface-box: #EFECE3;
-      --surface-card: #FAF8F3;
-      --border-subtle: rgba(31, 29, 25, 0.12);
-      --border-focus: rgba(31, 29, 25, 0.32);
-      --text-primary: #1C1B18;
-      --text-secondary: #706D65;
-      --text-placeholder: #8A867D;
-      --pill-bg: #E4E0D5;
-      --pill-active: #DAD5C8;
+      /* Sleek Dark Graphite / Charcoal / Near-Black Palette */
+      --bg-main: #121212;
+      --bg-sidebar: #171717;
+      --surface-box: #1E1E1E;
+      --surface-card: #181818;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(255, 255, 255, 0.22);
+      --text-primary: #F0F0EE;
+      --text-secondary: #94938F;
+      --text-placeholder: #5C5B57;
+      --pill-bg: #242423;
+      --pill-active: #323230;
     }
 
     * {
@@ -65,7 +63,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background-color: var(--bg-cream);
+      background-color: var(--bg-main);
       color: var(--text-primary);
       font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -85,7 +83,7 @@
     .sidebar-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(247, 244, 236, 0.45);
+      background: rgba(0, 0, 0, 0.6);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       z-index: 45;
@@ -115,7 +113,7 @@
       z-index: 50;
       transform: translateX(-100%);
       transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 35px rgba(0, 0, 0, 0.07);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
     }
 
     .sidebar.open {
@@ -135,7 +133,7 @@
       color: var(--text-primary);
     }
 
-    /* + New Chat Button in Sidebar */
+    /* + New Consultation Button in Sidebar */
     .new-chat-btn {
       display: flex;
       align-items: center;
@@ -152,11 +150,12 @@
       color: var(--text-primary);
       cursor: pointer;
       margin-bottom: 12px;
-      transition: background-color 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
     }
 
     .new-chat-btn:hover {
-      background-color: #E6E2D8;
+      background-color: #272726;
+      border-color: var(--border-focus);
     }
 
     .search-box {
@@ -175,7 +174,7 @@
 
     .search-input {
       width: 100%;
-      background-color: var(--bg-cream);
+      background-color: var(--bg-main);
       border: 1px solid var(--border-subtle);
       border-radius: 10px;
       padding: 8px 11px 8px 33px;
@@ -223,11 +222,11 @@
     }
 
     .patient-item:hover {
-      background-color: rgba(28, 27, 24, 0.04);
+      background-color: rgba(255, 255, 255, 0.04);
     }
 
     .patient-item.active {
-      background-color: var(--bg-cream);
+      background-color: var(--surface-box);
       border-color: var(--border-subtle);
     }
 
@@ -241,7 +240,8 @@
       font-size: 12px;
       font-weight: 500;
       color: var(--text-primary);
-      background-color: #E6E2D8;
+      background-color: #262624;
+      border: 1px solid var(--border-subtle);
       flex-shrink: 0;
     }
 
@@ -300,7 +300,7 @@
       width: 100%;
       position: sticky;
       top: 0;
-      background-color: var(--bg-cream);
+      background-color: var(--bg-main);
       z-index: 20;
     }
 
@@ -324,7 +324,7 @@
     }
 
     .icon-btn:hover {
-      background-color: rgba(28, 27, 24, 0.05);
+      background-color: rgba(255, 255, 255, 0.06);
       color: var(--text-primary);
     }
 
@@ -358,177 +358,11 @@
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background-color: #E2DDD3;
+      background-color: #272725;
       color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    /* Details Modal Backdrop with Blur */
-    .details-modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(24, 23, 20, 0.42);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      z-index: 60;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .details-modal-backdrop.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .details-modal {
-      width: 100%;
-      max-width: 680px;
-      max-height: 88vh;
-      overflow-y: auto;
-      background-color: var(--surface-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 22px;
-      padding: 30px 32px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-      position: relative;
-      transform: translateY(14px) scale(0.97);
-      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .details-modal-backdrop.open .details-modal {
-      transform: translateY(0) scale(1);
-    }
-
-    .modal-close-btn {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: rgba(31, 29, 25, 0.05);
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    .modal-close-btn:hover {
-      background: rgba(31, 29, 25, 0.1);
-      color: var(--text-primary);
-    }
-
-    /* Stylized Center Profile Header */
-    .modal-profile-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding-bottom: 22px;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .modal-profile-avatar {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      background: #E5E1D5;
-      border: 2px solid rgba(31, 29, 25, 0.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 500;
-      color: var(--text-primary);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-      margin-bottom: 12px;
-    }
-
-    .modal-patient-name {
-      font-family: 'New York', -apple-system-ui-serif, Georgia, serif;
-      font-size: 24px;
-      font-weight: 300;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .modal-badge-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .modal-tag {
-      font-size: 11.5px;
-      background-color: var(--surface-box);
-      border: 1px solid var(--border-subtle);
-      border-radius: 999px;
-      padding: 3px 10px;
-      color: var(--text-secondary);
-    }
-
-    /* Organized 2-Column Grid with Generous Row Spacing */
-    .modal-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px 24px;
-      margin-top: 24px;
-    }
-
-    .info-card {
-      background-color: var(--surface-box);
-      border: 1px solid var(--border-subtle);
-      border-radius: 14px;
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .info-card-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .info-card-value {
-      font-size: 13.5px;
-      color: var(--text-primary);
-      font-weight: 500;
-      line-height: 1.45;
-    }
-
-    .info-card-desc {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.45;
-      margin-top: 3px;
-    }
-
-    /* Modal Responsive */
-    @media (max-width: 600px) {
-      .details-modal {
-        padding: 24px 20px;
-      }
-      .modal-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
     }
 
     /* Main Stage */
@@ -571,7 +405,7 @@
       color: var(--text-primary);
     }
 
-    /* Refined New York Serif: thin weight with reduced letter spacing */
+    /* Refined New York Serif */
     .serif-header {
       font-family: 'New York', -apple-system-ui-serif, ui-serif, Georgia, serif;
       font-size: 44px;
@@ -625,11 +459,11 @@
       background-color: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: 16px 16px 16px 4px;
-      padding: 16px 18px;
+      padding: 18px 20px;
       font-size: 13.5px;
       line-height: 1.6;
       color: var(--text-primary);
-      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.02);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
     .assistant-bubble-header {
@@ -668,7 +502,7 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 114px;
-      box-shadow: 0 4px 20px rgba(31, 29, 25, 0.05);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
       transition: border-color 0.15s ease;
     }
 
@@ -705,7 +539,7 @@
       gap: 10px;
     }
 
-    /* [ Chat | Details ] Toggle - Soft neutral tones */
+    /* [ Chat | Details ] Toggle */
     .segmented-toggle {
       display: inline-flex;
       align-items: center;
@@ -759,7 +593,7 @@
 
     /* Chevron-Up Send Button */
     .send-chevron-btn {
-      background-color: #E2DDD3;
+      background-color: #272725;
       border: 1px solid var(--border-subtle);
       color: var(--text-primary);
       cursor: pointer;
@@ -773,76 +607,164 @@
     }
 
     .send-chevron-btn:hover {
-      background-color: #D6D1C5;
+      background-color: #333330;
       transform: translateY(-1px);
     }
 
-    /* Workspace Panel for Details (Hospital File) */
-    .workspace-panel {
-      width: 100%;
-      max-width: 640px;
-      margin: 16px auto 20px auto;
-      background-color: var(--surface-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 18px 20px;
-      display: none;
-    }
-
-    .workspace-panel.visible {
-      display: block;
-    }
-
-    .file-header {
+    /* Details Modal Backdrop & Container */
+    .details-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 60;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .details-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .details-modal {
+      width: 100%;
+      max-width: 660px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 34px 36px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .details-modal-backdrop.open .details-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: var(--text-primary);
+    }
+
+    /* Stylized Center Profile Header */
+    .modal-profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-bottom: 22px;
       border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 12px;
-      margin-bottom: 14px;
     }
 
-    .file-title {
-      font-size: 14.5px;
+    .modal-profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #242423;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
       font-weight: 500;
       color: var(--text-primary);
+      margin-bottom: 12px;
     }
 
-    .file-id-tag {
+    .modal-patient-name {
+      font-family: 'New York', -apple-system-ui-serif, Georgia, serif;
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .modal-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .modal-tag {
       font-size: 11.5px;
       background-color: var(--surface-box);
-      padding: 3px 8px;
-      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 3px 10px;
       color: var(--text-secondary);
     }
 
-    .file-grid {
+    /* Editorial Details (Pure Typography & Generous Spacing - NO Boxed Cards) */
+    .modal-columns-wrap {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px 16px;
-      font-size: 13px;
-      margin-bottom: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 26px;
     }
 
-    .file-field-label {
-      color: var(--text-secondary);
-      font-size: 11.5px;
-      margin-bottom: 2px;
+    .modal-col {
+      display: flex;
+      flex-direction: column;
     }
 
-    .file-field-value {
+    .col-section-title {
+      font-size: 15px;
+      font-weight: 700;
       color: var(--text-primary);
-      font-weight: 500;
+      margin-bottom: 22px;
+      letter-spacing: -0.01em;
     }
 
-    .triage-box {
-      background-color: var(--surface-box);
-      border-left: 3px solid #8E8A80;
-      padding: 10px 12px;
-      border-radius: 0 10px 10px 0;
+    .detail-block {
+      margin-bottom: 24px;
+    }
+
+    .detail-block:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-label {
       font-size: 13px;
-      line-height: 1.45;
-      margin-bottom: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .detail-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.55;
     }
 
     .qloo-chip-row {
@@ -862,11 +784,11 @@
     }
 
     .question-card {
-      background-color: var(--bg-cream);
+      background-color: var(--surface-box);
       border: 1px solid var(--border-subtle);
       border-radius: 10px;
-      padding: 10px 12px;
-      margin-top: 8px;
+      padding: 12px 14px;
+      margin-top: 10px;
       font-size: 13px;
     }
 
@@ -889,8 +811,12 @@
       .top-bar {
         padding: 12px 14px;
       }
-      .file-grid {
+      .details-modal {
+        padding: 24px 20px;
+      }
+      .modal-columns-wrap {
         grid-template-columns: 1fr;
+        gap: 20px;
       }
       .composer-card {
         padding: 14px 12px 10px 14px;
@@ -903,10 +829,10 @@
     <!-- Blur Backdrop Overlay (closes sidebar when clicked) -->
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-    <!-- Slide-out Sidebar with + New Chat & Patient Profiles -->
+    <!-- Slide-out Sidebar with + New Consultation & Patient Profiles -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-title">Clinic Chats</span>
+        <span class="sidebar-title">Clinic Consultations</span>
         <button type="button" class="icon-btn" id="closeSidebarBtn" aria-label="Close sidebar">
           <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
             <path d="M4.5 4.5L13.5 13.5M13.5 4.5L4.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
@@ -914,7 +840,7 @@
         </button>
       </div>
 
-      <!-- New Chat Button -->
+      <!-- New Consultation Button -->
       <button type="button" class="new-chat-btn" id="newChatSidebarBtn">
         <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
           <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -936,7 +862,7 @@
         />
       </div>
 
-      <div class="sidebar-section-label">Patients Attended (4)</div>
+      <div class="sidebar-section-label">Patients in Clinic (4)</div>
       <div class="patient-list" id="patientList"></div>
     </aside>
 
@@ -955,7 +881,7 @@
         </div>
 
         <!-- Doctor Profile Badge on Top Right -->
-        <div class="doc-badge" title="Attending: Dr. Noble">
+        <div class="doc-badge" title="Attending Physician: Dr. Noble">
           <div class="doc-avatar-circle">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M11 2v2" />
@@ -1040,7 +966,7 @@
       </main>
     </div>
 
-    <!-- Details Modal Backdrop & Dialog (Doesn't affect page layout) -->
+    <!-- Details Modal Backdrop & Dialog -->
     <div class="details-modal-backdrop" id="detailsModalBackdrop">
       <div class="details-modal" id="detailsModal">
         <button type="button" class="modal-close-btn" id="closeDetailsModalBtn" aria-label="Close details">
@@ -1054,7 +980,7 @@
   </div>
 
   <script>
-    // 4 Attended Patients in Clinic
+    // Patients in Clinic
     const PATIENTS = [
       {
         id: 'PT-2041',
@@ -1235,7 +1161,7 @@
     };
 
     let activePatient = null;
-    let currentMode = 'Chat'; // 'Chat' or 'Details'
+    let currentMode = 'Chat';
 
     const sidebar = document.getElementById('sidebar');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
@@ -1253,6 +1179,10 @@
     const sendBtn = document.getElementById('sendBtn');
     const headerChatTitle = document.getElementById('headerChatTitle');
 
+    const detailsModalBackdrop = document.getElementById('detailsModalBackdrop');
+    const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
+    const detailsModalBody = document.getElementById('detailsModalBody');
+
     function toggleSidebar(open) {
       const isOpen = typeof open === 'boolean' ? open : !sidebar.classList.contains('open');
       sidebar.classList.toggle('open', isOpen);
@@ -1264,7 +1194,101 @@
     quickSidebarBtn.addEventListener('click', () => toggleSidebar(true));
     sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
 
-    // Reset to Empty State / New Chat
+    function closeDetailsModal() {
+      detailsModalBackdrop.classList.remove('open');
+      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
+      currentMode = 'Chat';
+    }
+
+    closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
+    detailsModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === detailsModalBackdrop) {
+        closeDetailsModal();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && detailsModalBackdrop.classList.contains('open')) {
+        closeDetailsModal();
+      }
+    });
+
+    // Details Modal with Stylized Top Profile and Pure Whitespace 2-Column Grid
+    function openDetailsModal() {
+      const p = activePatient || PATIENTS[0];
+
+      detailsModalBody.innerHTML = `
+        <div class="modal-profile-header">
+          <div class="modal-profile-avatar">${p.initials}</div>
+          <div class="modal-patient-name">${p.name}</div>
+          <div class="modal-badge-row">
+            <span class="modal-tag">Patient #${p.id}</span>
+            <span class="modal-tag">${p.age} years old · ${p.sex}</span>
+            <span class="modal-tag">${p.maritalStatus}</span>
+          </div>
+        </div>
+
+        <div class="modal-columns-wrap">
+          <!-- Column 1: Personal Details (Bold title, clean separation by spacing) -->
+          <div class="modal-col">
+            <h3 class="col-section-title">Personal details</h3>
+
+            <div class="detail-block">
+              <div class="detail-label">Residential Environment</div>
+              <div class="detail-content">${p.location}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Occupation &amp; Routine</div>
+              <div class="detail-content">${p.occupation}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Family &amp; Social Status</div>
+              <div class="detail-content">${p.maritalStatus}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Cultural &amp; Dietary Peer Staples</div>
+              <div class="detail-content">${p.lifestyleSummary[2] || p.lifestyleSummary[0]}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Recreational Peer Habits</div>
+              <div class="detail-content">${p.lifestyleSummary[0]}</div>
+            </div>
+          </div>
+
+          <!-- Column 2: Clinical Details (Bold title, clean separation by spacing) -->
+          <div class="modal-col">
+            <h3 class="col-section-title">Clinical details</h3>
+
+            <div class="detail-block">
+              <div class="detail-label">Triage Vitals</div>
+              <div class="detail-content">${p.vitals}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Chief Complaint</div>
+              <div class="detail-content">${p.chiefComplaint}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Triage Observations</div>
+              <div class="detail-content">${p.triageNote}</div>
+            </div>
+
+            <div class="detail-block">
+              <div class="detail-label">Qloo Lifestyle Link</div>
+              <div class="detail-content">${p.diagnosticQuestions[0]?.clinicalWhy || 'Peer-group lifestyle signals cross-referenced against symptom presentation.'}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      detailsModalBackdrop.classList.add('open');
+    }
+
+    // Reset to Empty State / New Consultation
     function startNewChat() {
       activePatient = null;
       currentMode = 'Chat';
@@ -1290,7 +1314,7 @@
       startNewChat();
     });
 
-    // Load an existing patient's chat
+    // Load an existing patient's consultation chat
     function selectPatientChat(patient) {
       activePatient = patient;
       toggleSidebar(false);
@@ -1309,7 +1333,6 @@
       const history = CHAT_HISTORY[activePatient.id] || [];
 
       if (history.length === 0) {
-        // Start conversation prompt for this patient
         mainStage.classList.remove('empty-state');
         heroGreeting.classList.add('hidden');
         chatThread.classList.add('visible');
@@ -1356,7 +1379,7 @@
               .map(
                 (q) => `
                 <div class="question-card">
-                  <div style="font-size:11px;color:var(--text-secondary);font-weight:500;margin-bottom:2px;">PROBE: ${q.trigger.toUpperCase()}</div>
+                  <div style="font-size:11px;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PROBE: ${q.trigger.toUpperCase()}</div>
                   <div style="font-weight:500;margin-bottom:3px;color:var(--text-primary);">${q.question}</div>
                   <div style="font-size:11.5px;color:var(--text-secondary);">${q.clinicalWhy}</div>
                 </div>
@@ -1371,14 +1394,14 @@
                     <span>Roots Clinical Agent · Qloo Taste AI (${msg.location || activePatient.location})</span>
                   </div>
                   <div>
-                    <strong>Peer Lifestyle &amp; Environmental Factors:</strong>
-                    <ul style="padding-left:18px;margin:6px 0 10px 0;">
+                    <strong style="color:var(--text-primary);">Peer Lifestyle &amp; Environmental Factors:</strong>
+                    <ul style="padding-left:18px;margin:6px 0 10px 0;color:var(--text-secondary);">
                       ${(msg.lifestyle || activePatient.lifestyleSummary).map((l) => `<li style="margin-bottom:3px;">${l}</li>`).join('')}
                     </ul>
                   </div>
                   ${chips ? `<div class="qloo-chip-row">${chips}</div>` : ''}
-                  <div style="margin-top:12px;">
-                    <strong>Diagnostic Questions for Dr. Noble:</strong>
+                  <div style="margin-top:14px;">
+                    <strong style="color:var(--text-primary);">Diagnostic Questions for Dr. Noble:</strong>
                     ${questionsHtml}
                   </div>
                 </div>
@@ -1389,100 +1412,6 @@
         .join('');
 
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-
-    const detailsModalBackdrop = document.getElementById('detailsModalBackdrop');
-    const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
-    const detailsModalBody = document.getElementById('detailsModalBody');
-
-    function closeDetailsModal() {
-      detailsModalBackdrop.classList.remove('open');
-      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
-      currentMode = 'Chat';
-    }
-
-    closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
-    detailsModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === detailsModalBackdrop) {
-        closeDetailsModal();
-      }
-    });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && detailsModalBackdrop.classList.contains('open')) {
-        closeDetailsModal();
-      }
-    });
-
-    function openDetailsModal() {
-      const p = activePatient || PATIENTS[0];
-
-      detailsModalBody.innerHTML = `
-        <div class="modal-profile-header">
-          <div class="modal-profile-avatar">${p.initials}</div>
-          <div class="modal-patient-name">${p.name}</div>
-          <div class="modal-badge-row">
-            <span class="modal-tag">Patient #${p.id}</span>
-            <span class="modal-tag">${p.age} years old · ${p.sex}</span>
-            <span class="modal-tag">${p.maritalStatus}</span>
-          </div>
-        </div>
-
-        <div class="modal-grid">
-          <!-- Column 1: Personal & Demographics -->
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="info-card">
-              <span class="info-card-label">Residential City &amp; Environment</span>
-              <span class="info-card-value">${p.location}</span>
-              <span class="info-card-desc">Geographical &amp; cultural cluster queried via Qloo Taste AI.</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Occupation &amp; Routine Schedule</span>
-              <span class="info-card-value">${p.occupation}</span>
-              <span class="info-card-desc">Daily physical activity, posture, and commute exposures.</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Cultural &amp; Dietary Peer Staples</span>
-              <span class="info-card-value">${p.lifestyleSummary[2] || p.lifestyleSummary[0]}</span>
-              <span class="info-card-desc">Local dining spots, traditional recipes, and beverage habits.</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Recreational Peer Habits</span>
-              <span class="info-card-value">${p.lifestyleSummary[0]}</span>
-              <span class="info-card-desc">Physical activities, sports, and social venues common in cohort.</span>
-            </div>
-          </div>
-
-          <!-- Column 2: Clinical & Triage Presentation -->
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="info-card">
-              <span class="info-card-label">Triage Vitals</span>
-              <span class="info-card-value">${p.vitals}</span>
-              <span class="info-card-desc">Baseline clinical vitals recorded by triage nurse.</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Chief Complaint</span>
-              <span class="info-card-value">${p.chiefComplaint}</span>
-              <span class="info-card-desc">Primary symptom reported during registration.</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Nurse Triage Notes</span>
-              <span class="info-card-desc" style="color: var(--text-primary); margin-top: 0; font-size: 13px;">${p.triageNote}</span>
-            </div>
-
-            <div class="info-card">
-              <span class="info-card-label">Qloo Clinical Link</span>
-              <span class="info-card-desc" style="color: var(--text-primary); margin-top: 0; font-size: 13px;">${p.diagnosticQuestions[0]?.clinicalWhy || 'Lifestyle exposure cross-referenced against symptom presentation.'}</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      detailsModalBackdrop.classList.add('open');
     }
 
     function renderPatientList(filterText = '') {
@@ -1531,11 +1460,47 @@
     // Send Message / Chat Interaction
     async function handleSendMessage() {
       const text = promptInput.value.trim();
-      if (!text && !activePatient) {
-        // If empty on start, default to Chinedu
-        activePatient = PATIENTS[0];
-      } else if (!activePatient) {
-        activePatient = PATIENTS[0];
+      
+      // If no patient is currently selected (e.g. from New Consultation), create one dynamically!
+      if (!activePatient) {
+        if (!text) {
+          activePatient = PATIENTS[0];
+        } else {
+          // Detect or create new consultation patient from prompt
+          const newId = 'PT-' + Math.floor(2050 + Math.random() * 50);
+          const firstWord = text.split(' ')[0] || 'Patient';
+          const newPt = {
+            id: newId,
+            initials: firstWord.slice(0, 2).toUpperCase(),
+            name: text.length > 28 ? text.slice(0, 28) + '...' : text,
+            age: 32,
+            sex: 'Patient',
+            qlooAge: '24_and_younger',
+            qlooGender: 'male',
+            qlooLocation: 'Enugu',
+            qlooTagQuery: 'lifestyle',
+            maritalStatus: 'Consultation Intake',
+            occupation: 'New Consultation Case',
+            location: 'Client Intake Environment',
+            vitals: 'Vitals pending examination',
+            chiefComplaint: text,
+            triageNote: text,
+            lifestyleSummary: [
+              'Daily environmental & peer cohort factors being analyzed via Qloo',
+              'Regional food, recreational, and commute habits'
+            ],
+            diagnosticQuestions: [
+              {
+                trigger: 'Initial Lifestyle Anamnesis',
+                question: `"How long have these symptoms been present, and do they change based on your daily physical routine or meals?"`,
+                clinicalWhy: 'Gathers baseline temporal and lifestyle triggers.'
+              }
+            ]
+          };
+          PATIENTS.unshift(newPt);
+          activePatient = newPt;
+          renderPatientList();
+        }
       }
 
       const userText = text || `Analyze lifestyle and diagnostic questions for ${activePatient.name}`;
@@ -1545,18 +1510,15 @@
         CHAT_HISTORY[activePatient.id] = [];
       }
 
-      // Add user message to history
       CHAT_HISTORY[activePatient.id].push({
         role: 'user',
         text: userText
       });
 
-      // Switch to Chat mode and render
       currentMode = 'Chat';
       modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
       renderChatThread();
 
-      // Show typing indicator in assistant bubble
       const thread = document.getElementById('chatThread');
       const tempId = 'temp-' + Date.now();
       const typingEl = document.createElement('div');
@@ -1594,7 +1556,6 @@
           questions: activePatient.diagnosticQuestions
         };
 
-        // Replace typing indicator with response
         CHAT_HISTORY[activePatient.id].push(assistantResponse);
         const el = document.getElementById(tempId);
         if (el) el.remove();
@@ -1604,7 +1565,7 @@
         if (el) {
           el.innerHTML = `
             <div class="assistant-bubble">
-              <p style="color:red;">Error connecting to Qloo API: ${escapeHtml(err.message)}</p>
+              <p style="color:#E57373;">Error connecting to Qloo API: ${escapeHtml(err.message)}</p>
             </div>
           `;
         }
@@ -1646,7 +1607,7 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Initial render: empty state with sidebar list ready
+    // Initial render
     renderPatientList();
   </script>
 </body>
