@@ -8,6 +8,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
   <style>
+    /* Bundled Local New York Serif */
+    @font-face {
+      font-family: 'New York';
+      src: url('/fonts/NewYork.otf') format('opentype');
+      font-weight: 300 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
     /* Bundled Local Circular Std for Body */
     @font-face {
       font-family: 'Circular Std';
@@ -43,8 +52,6 @@
       --text-primary: #1C1B18;
       --text-secondary: #706D65;
       --text-placeholder: #8A867D;
-      /* GSAP Signature Green used ONLY for Hero Text & Logo */
-      --gsap-green: #0AE448;
       --pill-bg: #E4E0D5;
       --pill-active: #DAD5C8;
     }
@@ -362,22 +369,21 @@
       text-align: center;
     }
 
-    /* The exact Roots Logo from user reference in GSAP green */
     .roots-logo-svg {
-      width: 42px;
-      height: 28px;
+      width: 38px;
+      height: 25px;
       flex-shrink: 0;
-      color: var(--gsap-green);
+      color: var(--text-primary);
     }
 
-    /* Hero text in GSAP green */
+    /* Refined New York Serif: thin weight with reduced letter spacing */
     .serif-header {
-      font-family: 'Newsreader', 'Instrument Serif', Georgia, serif;
-      font-size: 42px;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      color: var(--gsap-green);
-      font-weight: 400;
+      font-family: 'New York', -apple-system-ui-serif, ui-serif, Georgia, serif;
+      font-size: 44px;
+      line-height: 1.12;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      font-weight: 300;
     }
 
     /* Composer Card */
@@ -721,14 +727,14 @@
 
       <!-- Main Stage -->
       <main class="main-stage">
-        <!-- Hero Greeting with exact reference Roots Logo in GSAP Green -->
+        <!-- Hero Greeting with Roots Logo beside the text -->
         <div class="hero-greeting">
-          <!-- Exact Semicircular Roots Logo Vector from Reference Image in GSAP Green -->
+          <!-- Semicircular Roots Logo Vector from Reference Image -->
           <svg class="roots-logo-svg" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
             <!-- Top Ground Line -->
-            <line x1="2" y1="4" x2="46" y2="4" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+            <line x1="2" y1="4" x2="46" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             <!-- Root System radiating downwards in semi-circle -->
-            <g stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
               <!-- Central main trunk & branches -->
               <path d="M24 4V10C24 14 21 20 22 27" />
               <path d="M24 10C24 14 27 20 26 27" />

@@ -63,10 +63,16 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400&family=Source+Serif+4:opsz,wght@8..60,400&display=swap');
+@font-face {
+  font-family: 'New York';
+  src: url('/fonts/NewYork.otf') format('opentype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 .serif-header {
-  font-family: 'Copernicus', 'Tiempos Headline', 'Source Serif 4', 'Newsreader', Georgia, serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
+  font-family: 'New York', -apple-system-ui-serif, ui-serif, Georgia, serif;
+  font-weight: 300;
+  letter-spacing: -0.04em;
 }
