@@ -365,29 +365,170 @@
       justify-content: center;
     }
 
-    /* Top Center Pill */
-    .plan-pill-wrap {
+    /* Details Modal Backdrop with Blur */
+    .details-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(24, 23, 20, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 60;
       display: flex;
-      justify-content: center;
-      margin-top: 2px;
-    }
-
-    .plan-pill {
-      background-color: rgba(28, 27, 24, 0.05);
-      border-radius: 9999px;
-      padding: 5px 14px;
-      font-size: 12.5px;
-      color: var(--text-secondary);
-      display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .plan-pill a {
-      color: #3B6CC9;
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      font-weight: 400;
+    .details-modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .details-modal {
+      width: 100%;
+      max-width: 680px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 22px;
+      padding: 30px 32px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      position: relative;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .details-modal-backdrop.open .details-modal {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(31, 29, 25, 0.05);
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(31, 29, 25, 0.1);
+      color: var(--text-primary);
+    }
+
+    /* Stylized Center Profile Header */
+    .modal-profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-profile-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #E5E1D5;
+      border: 2px solid rgba(31, 29, 25, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--text-primary);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+      margin-bottom: 12px;
+    }
+
+    .modal-patient-name {
+      font-family: 'New York', -apple-system-ui-serif, Georgia, serif;
+      font-size: 24px;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .modal-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .modal-tag {
+      font-size: 11.5px;
+      background-color: var(--surface-box);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 3px 10px;
+      color: var(--text-secondary);
+    }
+
+    /* Organized 2-Column Grid with Generous Row Spacing */
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px 24px;
+      margin-top: 24px;
+    }
+
+    .info-card {
+      background-color: var(--surface-box);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-card-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .info-card-value {
+      font-size: 13.5px;
+      color: var(--text-primary);
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .info-card-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-top: 3px;
+    }
+
+    /* Modal Responsive */
+    @media (max-width: 600px) {
+      .details-modal {
+        padding: 24px 20px;
+      }
+      .modal-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
     }
 
     /* Main Stage */
@@ -828,15 +969,6 @@
         </div>
       </header>
 
-      <!-- Top Center Pill (Free plan · Upgrade) -->
-      <div class="plan-pill-wrap" id="planPillWrap">
-        <div class="plan-pill">
-          <span>Free plan</span>
-          <span style="opacity: 0.45;">·</span>
-          <a href="#upgrade" onclick="event.preventDefault()">Upgrade</a>
-        </div>
-      </div>
-
       <!-- Main Stage -->
       <main class="main-stage empty-state" id="mainStage">
         <!-- Hero Greeting with Roots Logo (visible on empty state) -->
@@ -863,9 +995,6 @@
 
         <!-- Chat Conversation Messages Thread -->
         <div class="chat-thread" id="chatThread"></div>
-
-        <!-- Details (Hospital File) Panel -->
-        <section class="workspace-panel" id="workspacePanel"></section>
 
         <!-- Composer Card Container -->
         <div class="composer-container" id="composerContainer">
@@ -909,6 +1038,18 @@
           </div>
         </div>
       </main>
+    </div>
+
+    <!-- Details Modal Backdrop & Dialog (Doesn't affect page layout) -->
+    <div class="details-modal-backdrop" id="detailsModalBackdrop">
+      <div class="details-modal" id="detailsModal">
+        <button type="button" class="modal-close-btn" id="closeDetailsModalBtn" aria-label="Close details">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div id="detailsModalBody"></div>
+      </div>
     </div>
   </div>
 
@@ -1107,7 +1248,6 @@
     const mainStage = document.getElementById('mainStage');
     const heroGreeting = document.getElementById('heroGreeting');
     const chatThread = document.getElementById('chatThread');
-    const workspacePanel = document.getElementById('workspacePanel');
     const composerContainer = document.getElementById('composerContainer');
     const promptInput = document.getElementById('promptInput');
     const sendBtn = document.getElementById('sendBtn');
@@ -1135,7 +1275,6 @@
       heroGreeting.classList.remove('hidden');
       chatThread.classList.remove('visible');
       chatThread.innerHTML = '';
-      workspacePanel.classList.remove('visible');
       composerContainer.classList.remove('docked-bottom');
 
       headerChatTitle.classList.remove('visible');
@@ -1160,11 +1299,9 @@
       headerChatTitle.textContent = `${patient.name} (${patient.id})`;
       headerChatTitle.classList.add('visible');
 
-      if (currentMode === 'Details') {
-        renderDetailsPanel();
-      } else {
-        renderChatThread();
-      }
+      currentMode = 'Chat';
+      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
+      renderChatThread();
     }
 
     function renderChatThread() {
@@ -1175,7 +1312,6 @@
         // Start conversation prompt for this patient
         mainStage.classList.remove('empty-state');
         heroGreeting.classList.add('hidden');
-        workspacePanel.classList.remove('visible');
         chatThread.classList.add('visible');
         composerContainer.classList.add('docked-bottom');
         promptInput.placeholder = `Ask about ${activePatient.name.split(' ')[0]}'s lifestyle or symptoms...`;
@@ -1197,7 +1333,6 @@
       // Render existing conversation
       mainStage.classList.remove('empty-state');
       heroGreeting.classList.add('hidden');
-      workspacePanel.classList.remove('visible');
       chatThread.classList.add('visible');
       composerContainer.classList.add('docked-bottom');
       promptInput.placeholder = `Ask follow-up question about ${activePatient.name.split(' ')[0]}...`;
@@ -1256,51 +1391,98 @@
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }
 
-    function renderDetailsPanel() {
-      if (!activePatient) {
-        activePatient = PATIENTS[0];
+    const detailsModalBackdrop = document.getElementById('detailsModalBackdrop');
+    const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
+    const detailsModalBody = document.getElementById('detailsModalBody');
+
+    function closeDetailsModal() {
+      detailsModalBackdrop.classList.remove('open');
+      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
+      currentMode = 'Chat';
+    }
+
+    closeDetailsModalBtn.addEventListener('click', closeDetailsModal);
+    detailsModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === detailsModalBackdrop) {
+        closeDetailsModal();
       }
-      mainStage.classList.remove('empty-state');
-      heroGreeting.classList.add('hidden');
-      chatThread.classList.remove('visible');
-      workspacePanel.classList.add('visible');
-      composerContainer.classList.add('docked-bottom');
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && detailsModalBackdrop.classList.contains('open')) {
+        closeDetailsModal();
+      }
+    });
 
-      const p = activePatient;
-      workspacePanel.innerHTML = `
-        <div class="file-header">
-          <div class="file-title">Hospital Patient File — ${p.name}</div>
-          <span class="file-id-tag">File #${p.id}</span>
-        </div>
+    function openDetailsModal() {
+      const p = activePatient || PATIENTS[0];
 
-        <div class="file-grid">
-          <div>
-            <div class="file-field-label">Age &amp; Sex</div>
-            <div class="file-field-value">${p.age} yrs · ${p.sex}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Location</div>
-            <div class="file-field-value">${p.location}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Family / Peer Status</div>
-            <div class="file-field-value">${p.maritalStatus}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Occupation</div>
-            <div class="file-field-value">${p.occupation}</div>
-          </div>
-          <div style="grid-column: span 2;">
-            <div class="file-field-label">Triage Vitals</div>
-            <div class="file-field-value">${p.vitals}</div>
+      detailsModalBody.innerHTML = `
+        <div class="modal-profile-header">
+          <div class="modal-profile-avatar">${p.initials}</div>
+          <div class="modal-patient-name">${p.name}</div>
+          <div class="modal-badge-row">
+            <span class="modal-tag">Patient #${p.id}</span>
+            <span class="modal-tag">${p.age} years old · ${p.sex}</span>
+            <span class="modal-tag">${p.maritalStatus}</span>
           </div>
         </div>
 
-        <div class="triage-box">
-          <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">TRIAGE NOTE &amp; CHIEF COMPLAINT</div>
-          <div><strong>${p.chiefComplaint}:</strong> ${p.triageNote}</div>
+        <div class="modal-grid">
+          <!-- Column 1: Personal & Demographics -->
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="info-card">
+              <span class="info-card-label">Residential City &amp; Environment</span>
+              <span class="info-card-value">${p.location}</span>
+              <span class="info-card-desc">Geographical &amp; cultural cluster queried via Qloo Taste AI.</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Occupation &amp; Routine Schedule</span>
+              <span class="info-card-value">${p.occupation}</span>
+              <span class="info-card-desc">Daily physical activity, posture, and commute exposures.</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Cultural &amp; Dietary Peer Staples</span>
+              <span class="info-card-value">${p.lifestyleSummary[2] || p.lifestyleSummary[0]}</span>
+              <span class="info-card-desc">Local dining spots, traditional recipes, and beverage habits.</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Recreational Peer Habits</span>
+              <span class="info-card-value">${p.lifestyleSummary[0]}</span>
+              <span class="info-card-desc">Physical activities, sports, and social venues common in cohort.</span>
+            </div>
+          </div>
+
+          <!-- Column 2: Clinical & Triage Presentation -->
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="info-card">
+              <span class="info-card-label">Triage Vitals</span>
+              <span class="info-card-value">${p.vitals}</span>
+              <span class="info-card-desc">Baseline clinical vitals recorded by triage nurse.</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Chief Complaint</span>
+              <span class="info-card-value">${p.chiefComplaint}</span>
+              <span class="info-card-desc">Primary symptom reported during registration.</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Nurse Triage Notes</span>
+              <span class="info-card-desc" style="color: var(--text-primary); margin-top: 0; font-size: 13px;">${p.triageNote}</span>
+            </div>
+
+            <div class="info-card">
+              <span class="info-card-label">Qloo Clinical Link</span>
+              <span class="info-card-desc" style="color: var(--text-primary); margin-top: 0; font-size: 13px;">${p.diagnosticQuestions[0]?.clinicalWhy || 'Lifestyle exposure cross-referenced against symptom presentation.'}</span>
+            </div>
+          </div>
         </div>
       `;
+
+      detailsModalBackdrop.classList.add('open');
     }
 
     function renderPatientList(filterText = '') {
@@ -1441,17 +1623,15 @@
     const modeButtons = document.querySelectorAll('#modeToggle .seg-btn');
     modeButtons.forEach((btn) => {
       btn.addEventListener('click', () => {
-        modeButtons.forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentMode = btn.dataset.mode;
-
-        if (currentMode === 'Details') {
-          renderDetailsPanel();
+        const mode = btn.dataset.mode;
+        if (mode === 'Details') {
+          openDetailsModal();
         } else {
+          modeButtons.forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMode = 'Chat';
           if (activePatient) {
             renderChatThread();
-          } else {
-            workspacePanel.classList.remove('visible');
           }
         }
       });
