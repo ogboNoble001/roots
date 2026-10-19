@@ -48,7 +48,7 @@
       --surface-box: #EFECE3;
       --surface-card: #FAF8F3;
       --border-subtle: rgba(31, 29, 25, 0.12);
-      --border-focus: rgba(31, 29, 25, 0.28);
+      --border-focus: rgba(31, 29, 25, 0.32);
       --text-primary: #1C1B18;
       --text-secondary: #706D65;
       --text-placeholder: #8A867D;
@@ -99,7 +99,7 @@
       pointer-events: auto;
     }
 
-    /* Slide-out Sidebar covering the side */
+    /* Slide-out Sidebar covering the side with blur behind */
     .sidebar {
       width: 320px;
       max-width: 86vw;
@@ -126,13 +126,37 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 4px 14px 4px;
+      padding: 0 4px 12px 4px;
     }
 
     .sidebar-title {
       font-size: 14px;
       font-weight: 500;
       color: var(--text-primary);
+    }
+
+    /* + New Chat Button in Sidebar */
+    .new-chat-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      background-color: var(--surface-box);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 9px 12px;
+      font-family: 'Circular Std', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background-color 0.15s ease;
+    }
+
+    .new-chat-btn:hover {
+      background-color: #E6E2D8;
     }
 
     .search-box {
@@ -207,7 +231,6 @@
       border-color: var(--border-subtle);
     }
 
-    /* Neutral Avatar circle - No green or harsh black */
     .patient-avatar {
       width: 34px;
       height: 34px;
@@ -275,6 +298,16 @@
       justify-content: space-between;
       padding: 16px 22px;
       width: 100%;
+      position: sticky;
+      top: 0;
+      background-color: var(--bg-cream);
+      z-index: 20;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .icon-btn {
@@ -295,7 +328,18 @@
       color: var(--text-primary);
     }
 
-    /* Doctor Profile Icon on Top Right - Clean neutral, no black fill */
+    .header-chat-title {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--text-primary);
+      display: none;
+    }
+
+    .header-chat-title.visible {
+      display: inline-block;
+    }
+
+    /* Doctor Profile Badge on Top Right */
     .doc-badge {
       display: inline-flex;
       align-items: center;
@@ -351,15 +395,21 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px 20px 10vh 20px;
-      max-width: 720px;
       width: 100%;
+      max-width: 720px;
       margin: 0 auto;
+      padding: 20px 20px 24px 20px;
+      position: relative;
     }
 
-    /* Hero Greeting with Roots Logo beside the text */
+    /* Main stage in empty state (centered) */
+    .main-stage.empty-state {
+      align-items: center;
+      justify-content: center;
+      padding-bottom: 12vh;
+    }
+
+    /* Hero Greeting with Roots Logo */
     .hero-greeting {
       display: flex;
       align-items: center;
@@ -367,6 +417,10 @@
       gap: 14px;
       margin-bottom: 28px;
       text-align: center;
+    }
+
+    .hero-greeting.hidden {
+      display: none;
     }
 
     .roots-logo-svg {
@@ -386,10 +440,85 @@
       font-weight: 300;
     }
 
+    /* Conversation Thread (shown when chatting) */
+    .chat-thread {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+      width: 100%;
+      flex: 1;
+      padding-bottom: 20px;
+    }
+
+    .chat-thread.visible {
+      display: flex;
+    }
+
+    /* Message Bubbles */
+    .message-row {
+      display: flex;
+      width: 100%;
+    }
+
+    .message-row.user {
+      justify-content: flex-end;
+    }
+
+    .message-row.assistant {
+      justify-content: flex-start;
+    }
+
+    .user-bubble {
+      max-width: 82%;
+      background-color: var(--surface-box);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px 16px 4px 16px;
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .assistant-bubble {
+      width: 100%;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px 16px 16px 4px;
+      padding: 16px 18px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .assistant-bubble-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 8px;
+    }
+
     /* Composer Card */
-    .composer-card {
+    .composer-container {
       width: 100%;
       max-width: 640px;
+      margin: 0 auto;
+      transition: all 0.2s ease;
+    }
+
+    .composer-container.docked-bottom {
+      position: sticky;
+      bottom: 20px;
+      z-index: 15;
+    }
+
+    .composer-card {
+      width: 100%;
       background-color: var(--surface-box);
       border: 1px solid var(--border-subtle);
       border-radius: 18px;
@@ -398,7 +527,7 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 114px;
-      box-shadow: 0 2px 12px rgba(31, 29, 25, 0.03);
+      box-shadow: 0 4px 20px rgba(31, 29, 25, 0.05);
       transition: border-color 0.15s ease;
     }
 
@@ -435,7 +564,7 @@
       gap: 10px;
     }
 
-    /* [ Chat | Details ] Toggle - Soft neutral tones, no harsh blacks */
+    /* [ Chat | Details ] Toggle - Soft neutral tones */
     .segmented-toggle {
       display: inline-flex;
       align-items: center;
@@ -487,7 +616,7 @@
       color: var(--text-secondary);
     }
 
-    /* Chevron-Up Send Button - Soft neutral circle, NO black fill */
+    /* Chevron-Up Send Button */
     .send-chevron-btn {
       background-color: #E2DDD3;
       border: 1px solid var(--border-subtle);
@@ -507,11 +636,11 @@
       transform: translateY(-1px);
     }
 
-    /* Workspace Panel for Details (Hospital File) or Chat results */
+    /* Workspace Panel for Details (Hospital File) */
     .workspace-panel {
       width: 100%;
       max-width: 640px;
-      margin-top: 16px;
+      margin: 16px auto 20px auto;
       background-color: var(--surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: 16px;
@@ -575,34 +704,6 @@
       margin-bottom: 14px;
     }
 
-    .qloo-action-btn {
-      background-color: #E2DDD3;
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-      border-radius: 9px;
-      padding: 8px 14px;
-      font-family: 'Circular Std', sans-serif;
-      font-size: 12.5px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: background-color 0.15s ease;
-    }
-
-    .qloo-action-btn:hover {
-      background-color: #D6D1C5;
-    }
-
-    .qloo-results-box {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
     .qloo-chip-row {
       display: flex;
       flex-wrap: wrap;
@@ -634,15 +735,15 @@
         font-size: 30px;
       }
       .roots-logo-svg {
-        width: 34px;
-        height: 22px;
+        width: 32px;
+        height: 20px;
       }
       .hero-greeting {
         gap: 10px;
         margin-bottom: 22px;
       }
       .main-stage {
-        padding: 12px 14px 6vh 14px;
+        padding: 12px 14px 18px 14px;
       }
       .top-bar {
         padding: 12px 14px;
@@ -661,16 +762,24 @@
     <!-- Blur Backdrop Overlay (closes sidebar when clicked) -->
     <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-    <!-- Slide-out Sidebar with Search & 4 Patient Profiles -->
+    <!-- Slide-out Sidebar with + New Chat & Patient Profiles -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
-        <span class="sidebar-title">Attended Patients</span>
+        <span class="sidebar-title">Clinic Chats</span>
         <button type="button" class="icon-btn" id="closeSidebarBtn" aria-label="Close sidebar">
           <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
             <path d="M4.5 4.5L13.5 13.5M13.5 4.5L4.5 13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </button>
       </div>
+
+      <!-- New Chat Button -->
+      <button type="button" class="new-chat-btn" id="newChatSidebarBtn">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+          <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>New Consultation</span>
+      </button>
 
       <!-- Search Bar -->
       <div class="search-box">
@@ -686,7 +795,7 @@
         />
       </div>
 
-      <div class="sidebar-section-label">Patients in clinic (4)</div>
+      <div class="sidebar-section-label">Patients Attended (4)</div>
       <div class="patient-list" id="patientList"></div>
     </aside>
 
@@ -694,12 +803,15 @@
     <div class="main-area">
       <!-- Top Bar -->
       <header class="top-bar">
-        <button type="button" class="icon-btn" id="openSidebarBtn" aria-label="Open sidebar" title="Open Patient Sidebar">
-          <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
-            <rect x="2.5" y="3.5" width="15" height="13" rx="2.5" stroke="currentColor" stroke-width="1.4" />
-            <line x1="7.5" y1="3.5" x2="7.5" y2="16.5" stroke="currentColor" stroke-width="1.4" />
-          </svg>
-        </button>
+        <div class="top-bar-left">
+          <button type="button" class="icon-btn" id="openSidebarBtn" aria-label="Open sidebar" title="Open Patient Sidebar">
+            <svg width="19" height="19" viewBox="0 0 20 20" fill="none">
+              <rect x="2.5" y="3.5" width="15" height="13" rx="2.5" stroke="currentColor" stroke-width="1.4" />
+              <line x1="7.5" y1="3.5" x2="7.5" y2="16.5" stroke="currentColor" stroke-width="1.4" />
+            </svg>
+          </button>
+          <span class="header-chat-title" id="headerChatTitle"></span>
+        </div>
 
         <!-- Doctor Profile Badge on Top Right -->
         <div class="doc-badge" title="Attending: Dr. Noble">
@@ -716,8 +828,8 @@
         </div>
       </header>
 
-      <!-- Top Center Pill (Free plan · Upgrade style from screenshot) -->
-      <div class="plan-pill-wrap">
+      <!-- Top Center Pill (Free plan · Upgrade) -->
+      <div class="plan-pill-wrap" id="planPillWrap">
         <div class="plan-pill">
           <span>Free plan</span>
           <span style="opacity: 0.45;">·</span>
@@ -726,79 +838,76 @@
       </div>
 
       <!-- Main Stage -->
-      <main class="main-stage">
-        <!-- Hero Greeting with Roots Logo beside the text -->
-        <div class="hero-greeting">
-          <!-- Semicircular Roots Logo Vector from Reference Image -->
+      <main class="main-stage empty-state" id="mainStage">
+        <!-- Hero Greeting with Roots Logo (visible on empty state) -->
+        <div class="hero-greeting" id="heroGreeting">
           <svg class="roots-logo-svg" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Top Ground Line -->
             <line x1="2" y1="4" x2="46" y2="4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <!-- Root System radiating downwards in semi-circle -->
             <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-              <!-- Central main trunk & branches -->
               <path d="M24 4V10C24 14 21 20 22 27" />
               <path d="M24 10C24 14 27 20 26 27" />
-              <!-- Sub-central forks -->
               <path d="M22 17C20 21 17 25 18 29" />
               <path d="M26 17C28 21 31 25 30 29" />
-              <!-- Mid lateral branches -->
               <path d="M24 4C21 8 16 14 13 23" />
               <path d="M24 4C27 8 32 14 35 23" />
               <path d="M18 11C14 16 10 20 9 26" />
               <path d="M30 11C34 16 38 20 39 26" />
-              <!-- Outer fan arcs forming semicircular silhouette -->
               <path d="M24 4C18 6 10 9 5 15" />
               <path d="M24 4C30 6 38 9 43 15" />
               <path d="M12 7C9 10 6 14 4 19" />
               <path d="M36 7C39 10 42 14 44 19" />
             </g>
           </svg>
-
           <h1 class="serif-header">Good morning, Doctor Noble</h1>
         </div>
 
-        <!-- Composer Card -->
-        <div class="composer-card">
-          <textarea
-            id="promptInput"
-            class="composer-textarea"
-            rows="2"
-            placeholder="How can I help you today?"
-          ></textarea>
+        <!-- Chat Conversation Messages Thread -->
+        <div class="chat-thread" id="chatThread"></div>
 
-          <div class="composer-footer">
-            <div class="controls-left">
-              <button type="button" class="icon-btn" id="quickSidebarBtn" title="Select patient from sidebar" style="padding: 4px;">
-                <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                  <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                </svg>
-              </button>
+        <!-- Details (Hospital File) Panel -->
+        <section class="workspace-panel" id="workspacePanel"></section>
 
-              <!-- [ Chat | Details ] Toggle -->
-              <div class="segmented-toggle" id="modeToggle">
-                <button type="button" class="seg-btn active" data-mode="Chat">Chat</button>
-                <button type="button" class="seg-btn" data-mode="Details">Details</button>
+        <!-- Composer Card Container -->
+        <div class="composer-container" id="composerContainer">
+          <div class="composer-card">
+            <textarea
+              id="promptInput"
+              class="composer-textarea"
+              rows="2"
+              placeholder="How can I help you today?"
+            ></textarea>
+
+            <div class="composer-footer">
+              <div class="controls-left">
+                <button type="button" class="icon-btn" id="quickSidebarBtn" title="Select patient from sidebar" style="padding: 4px;">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                    <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                  </svg>
+                </button>
+
+                <!-- [ Chat | Details ] Toggle -->
+                <div class="segmented-toggle" id="modeToggle">
+                  <button type="button" class="seg-btn active" data-mode="Chat">Chat</button>
+                  <button type="button" class="seg-btn" data-mode="Details">Details</button>
+                </div>
               </div>
-            </div>
 
-            <div class="controls-right">
-              <div class="model-badge">
-                <span class="model-name">Qloo Taste Graph</span>
-                <span class="model-tier">v2</span>
+              <div class="controls-right">
+                <div class="model-badge">
+                  <span class="model-name">Qloo Taste Graph</span>
+                  <span class="model-tier">v2</span>
+                </div>
+
+                <!-- Chevron-Up Send Button -->
+                <button type="button" class="send-chevron-btn" id="sendBtn" title="Send message" aria-label="Send">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                    <path d="M8 12.5V3.5M3.5 8L8 3.5L12.5 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </button>
               </div>
-
-              <!-- Chevron-Up Send Button (Replaces Waveform/Record button) -->
-              <button type="button" class="send-chevron-btn" id="sendBtn" title="Send message" aria-label="Send">
-                <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 12.5V3.5M3.5 8L8 3.5L12.5 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </button>
             </div>
           </div>
         </div>
-
-        <!-- Dynamic Panel for Details (Hospital File) or Chat output -->
-        <section class="workspace-panel" id="workspacePanel"></section>
       </main>
     </div>
   </div>
@@ -944,19 +1053,65 @@
       }
     ];
 
-    let selectedPatient = PATIENTS[0];
-    let currentMode = 'Chat';
+    // Local Chat Store by Patient ID
+    const CHAT_HISTORY = {
+      'PT-2041': [
+        {
+          role: 'user',
+          text: 'Chinedu came in with acute right lower abdomen pain. He plays football in Enugu and eats street food. How can I differentiate muscle strain vs appendicitis vs food poisoning using his lifestyle?'
+        },
+        {
+          role: 'assistant',
+          patientName: 'Chinedu Okafor',
+          location: 'New Haven, Enugu City',
+          places: ['Otigba Roundabout Turf', 'New Haven Pitch', 'Shoprite Enugu'],
+          brands: ['Nutri-Milk', 'Climax Energy Drink'],
+          tags: ['soccer', 'street food'],
+          lifestyle: [
+            'Regular 5-aside football on unpaved/turf pitches (intense sprinting, right-hip extension)',
+            'Daily commuter Keke rides over bumpy, potholed roads across New Haven & Independence Layout',
+            'Enugu food habits: Morning Okpa, late-afternoon roadside Abacha / Shawarma joints'
+          ],
+          questions: [
+            {
+              trigger: 'Football & Keke Bumps (Jarring Test)',
+              question: '"When you kick with your right leg during ball, or when the Keke hits a pothole on the road, does it send a sharp stabbing shock into your right lower abdomen?"',
+              clinicalWhy: 'Movement and hip extension stretch the psoas muscle against an inflamed appendix (Psoas sign). Football muscle strains only hurt when flexing the abdominal wall, not on passive vehicular road jarring.'
+            },
+            {
+              trigger: 'Okpa / Shawarma Appetite Test',
+              question: '"If someone brings you hot Okpa or Shawarma right now, do you want to eat it, or does the thought of food make you nauseated?"',
+              clinicalWhy: 'Complete loss of appetite (anorexia) for favorite local food is a hallmark of acute appendicitis in young patients.'
+            },
+            {
+              trigger: 'Roadside Abacha vs. Periumbilical Migration',
+              question: '"Did you eat street Abacha and have watery stool right away, or did the pain start dull around your bellybutton before slowly moving down to your right side?"',
+              clinicalWhy: 'Food poisoning presents with rapid diarrhea and diffuse cramps, whereas appendicitis typically migrates from the umbilicus to McBurney\'s point over 12–24 hours.'
+            }
+          ]
+        }
+      ]
+    };
+
+    let activePatient = null;
+    let currentMode = 'Chat'; // 'Chat' or 'Details'
 
     const sidebar = document.getElementById('sidebar');
     const sidebarBackdrop = document.getElementById('sidebarBackdrop');
     const openSidebarBtn = document.getElementById('openSidebarBtn');
     const closeSidebarBtn = document.getElementById('closeSidebarBtn');
     const quickSidebarBtn = document.getElementById('quickSidebarBtn');
+    const newChatSidebarBtn = document.getElementById('newChatSidebarBtn');
     const patientListEl = document.getElementById('patientList');
     const patientSearchInput = document.getElementById('patientSearchInput');
+    const mainStage = document.getElementById('mainStage');
+    const heroGreeting = document.getElementById('heroGreeting');
+    const chatThread = document.getElementById('chatThread');
     const workspacePanel = document.getElementById('workspacePanel');
+    const composerContainer = document.getElementById('composerContainer');
     const promptInput = document.getElementById('promptInput');
     const sendBtn = document.getElementById('sendBtn');
+    const headerChatTitle = document.getElementById('headerChatTitle');
 
     function toggleSidebar(open) {
       const isOpen = typeof open === 'boolean' ? open : !sidebar.classList.contains('open');
@@ -968,6 +1123,185 @@
     closeSidebarBtn.addEventListener('click', () => toggleSidebar(false));
     quickSidebarBtn.addEventListener('click', () => toggleSidebar(true));
     sidebarBackdrop.addEventListener('click', () => toggleSidebar(false));
+
+    // Reset to Empty State / New Chat
+    function startNewChat() {
+      activePatient = null;
+      currentMode = 'Chat';
+      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
+
+      // Center stage & show hero
+      mainStage.classList.add('empty-state');
+      heroGreeting.classList.remove('hidden');
+      chatThread.classList.remove('visible');
+      chatThread.innerHTML = '';
+      workspacePanel.classList.remove('visible');
+      composerContainer.classList.remove('docked-bottom');
+
+      headerChatTitle.classList.remove('visible');
+      headerChatTitle.textContent = '';
+      promptInput.value = '';
+      promptInput.placeholder = 'How can I help you today?';
+      renderPatientList();
+      toggleSidebar(false);
+      promptInput.focus();
+    }
+
+    newChatSidebarBtn.addEventListener('click', () => {
+      startNewChat();
+    });
+
+    // Load an existing patient's chat
+    function selectPatientChat(patient) {
+      activePatient = patient;
+      toggleSidebar(false);
+      renderPatientList(patientSearchInput.value);
+
+      headerChatTitle.textContent = `${patient.name} (${patient.id})`;
+      headerChatTitle.classList.add('visible');
+
+      if (currentMode === 'Details') {
+        renderDetailsPanel();
+      } else {
+        renderChatThread();
+      }
+    }
+
+    function renderChatThread() {
+      if (!activePatient) return;
+      const history = CHAT_HISTORY[activePatient.id] || [];
+
+      if (history.length === 0) {
+        // Start conversation prompt for this patient
+        mainStage.classList.remove('empty-state');
+        heroGreeting.classList.add('hidden');
+        workspacePanel.classList.remove('visible');
+        chatThread.classList.add('visible');
+        composerContainer.classList.add('docked-bottom');
+        promptInput.placeholder = `Ask about ${activePatient.name.split(' ')[0]}'s lifestyle or symptoms...`;
+
+        chatThread.innerHTML = `
+          <div class="message-row assistant">
+            <div class="assistant-bubble">
+              <div class="assistant-bubble-header">
+                <span>Roots Clinical Agent · Qloo Taste AI</span>
+              </div>
+              <p>Ready to analyze <strong>${activePatient.name}</strong> (${activePatient.age}y, ${activePatient.location}).</p>
+              <p style="color:var(--text-secondary);margin-top:6px;">Chief Complaint: <em>"${activePatient.chiefComplaint}"</em>. Ask any question or press send to pull their peer-group lifestyle profile and diagnostic probes.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Render existing conversation
+      mainStage.classList.remove('empty-state');
+      heroGreeting.classList.add('hidden');
+      workspacePanel.classList.remove('visible');
+      chatThread.classList.add('visible');
+      composerContainer.classList.add('docked-bottom');
+      promptInput.placeholder = `Ask follow-up question about ${activePatient.name.split(' ')[0]}...`;
+
+      chatThread.innerHTML = history
+        .map((msg) => {
+          if (msg.role === 'user') {
+            return `
+              <div class="message-row user">
+                <div class="user-bubble">${escapeHtml(msg.text)}</div>
+              </div>
+            `;
+          } else {
+            const chips = [
+              ...(msg.places || []).map((p) => `<span class="qloo-chip">📍 ${p}</span>`),
+              ...(msg.brands || []).map((b) => `<span class="qloo-chip">🏷️ ${b}</span>`),
+              ...(msg.tags || []).map((t) => `<span class="qloo-chip"># ${t}</span>`)
+            ].join('');
+
+            const questionsHtml = (msg.questions || [])
+              .map(
+                (q) => `
+                <div class="question-card">
+                  <div style="font-size:11px;color:var(--text-secondary);font-weight:500;margin-bottom:2px;">PROBE: ${q.trigger.toUpperCase()}</div>
+                  <div style="font-weight:500;margin-bottom:3px;color:var(--text-primary);">${q.question}</div>
+                  <div style="font-size:11.5px;color:var(--text-secondary);">${q.clinicalWhy}</div>
+                </div>
+              `
+              )
+              .join('');
+
+            return `
+              <div class="message-row assistant">
+                <div class="assistant-bubble">
+                  <div class="assistant-bubble-header">
+                    <span>Roots Clinical Agent · Qloo Taste AI (${msg.location || activePatient.location})</span>
+                  </div>
+                  <div>
+                    <strong>Peer Lifestyle &amp; Environmental Factors:</strong>
+                    <ul style="padding-left:18px;margin:6px 0 10px 0;">
+                      ${(msg.lifestyle || activePatient.lifestyleSummary).map((l) => `<li style="margin-bottom:3px;">${l}</li>`).join('')}
+                    </ul>
+                  </div>
+                  ${chips ? `<div class="qloo-chip-row">${chips}</div>` : ''}
+                  <div style="margin-top:12px;">
+                    <strong>Diagnostic Questions for Dr. Noble:</strong>
+                    ${questionsHtml}
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        })
+        .join('');
+
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function renderDetailsPanel() {
+      if (!activePatient) {
+        activePatient = PATIENTS[0];
+      }
+      mainStage.classList.remove('empty-state');
+      heroGreeting.classList.add('hidden');
+      chatThread.classList.remove('visible');
+      workspacePanel.classList.add('visible');
+      composerContainer.classList.add('docked-bottom');
+
+      const p = activePatient;
+      workspacePanel.innerHTML = `
+        <div class="file-header">
+          <div class="file-title">Hospital Patient File — ${p.name}</div>
+          <span class="file-id-tag">File #${p.id}</span>
+        </div>
+
+        <div class="file-grid">
+          <div>
+            <div class="file-field-label">Age &amp; Sex</div>
+            <div class="file-field-value">${p.age} yrs · ${p.sex}</div>
+          </div>
+          <div>
+            <div class="file-field-label">Location</div>
+            <div class="file-field-value">${p.location}</div>
+          </div>
+          <div>
+            <div class="file-field-label">Family / Peer Status</div>
+            <div class="file-field-value">${p.maritalStatus}</div>
+          </div>
+          <div>
+            <div class="file-field-label">Occupation</div>
+            <div class="file-field-value">${p.occupation}</div>
+          </div>
+          <div style="grid-column: span 2;">
+            <div class="file-field-label">Triage Vitals</div>
+            <div class="file-field-value">${p.vitals}</div>
+          </div>
+        </div>
+
+        <div class="triage-box">
+          <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">TRIAGE NOTE &amp; CHIEF COMPLAINT</div>
+          <div><strong>${p.chiefComplaint}:</strong> ${p.triageNote}</div>
+        </div>
+      `;
+    }
 
     function renderPatientList(filterText = '') {
       const q = filterText.trim().toLowerCase();
@@ -981,7 +1315,7 @@
 
       patientListEl.innerHTML = filtered
         .map((p) => {
-          const isActive = p.id === selectedPatient.id;
+          const isActive = activePatient && p.id === activePatient.id;
           return `
             <button type="button" class="patient-item ${isActive ? 'active' : ''}" data-id="${p.id}">
               <div class="patient-avatar">${p.initials}</div>
@@ -1002,12 +1336,7 @@
         btn.addEventListener('click', () => {
           const found = PATIENTS.find((pt) => pt.id === btn.dataset.id);
           if (found) {
-            selectedPatient = found;
-            renderPatientList(patientSearchInput.value);
-            toggleSidebar(false);
-            if (currentMode === 'Details') {
-              renderDetailsPanel();
-            }
+            selectPatientChat(found);
           }
         });
       });
@@ -1017,117 +1346,96 @@
       renderPatientList(e.target.value);
     });
 
-    function renderDetailsPanel() {
-      const p = selectedPatient;
-      workspacePanel.classList.add('visible');
-      workspacePanel.innerHTML = `
-        <div class="file-header">
-          <div class="file-title">Hospital Patient File — ${p.name}</div>
-          <span class="file-id-tag">File #${p.id}</span>
-        </div>
-
-        <div class="file-grid">
-          <div>
-            <div class="file-field-label">Age &amp; Sex</div>
-            <div class="file-field-value">${p.age} yrs · ${p.sex}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Location</div>
-            <div class="file-field-value">${p.location}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Status</div>
-            <div class="file-field-value">${p.maritalStatus}</div>
-          </div>
-          <div>
-            <div class="file-field-label">Occupation</div>
-            <div class="file-field-value">${p.occupation}</div>
-          </div>
-          <div style="grid-column: span 2;">
-            <div class="file-field-label">Vitals</div>
-            <div class="file-field-value">${p.vitals}</div>
-          </div>
-        </div>
-
-        <div class="triage-box">
-          <div style="font-size:11.5px;color:var(--text-secondary);margin-bottom:3px;font-weight:500;">TRIAGE NOTE &amp; CHIEF COMPLAINT</div>
-          <div><strong>${p.chiefComplaint}:</strong> ${p.triageNote}</div>
-        </div>
-
-        <button type="button" class="qloo-action-btn" id="runQlooFromFileBtn">
-          <span>Query Qloo Lifestyle Intelligence for ${p.name.split(' ')[0]}</span>
-        </button>
-        <div id="qlooLiveContainer"></div>
-      `;
-
-      document.getElementById('runQlooFromFileBtn').addEventListener('click', () => {
-        runQlooLifestyleAnalysis();
-      });
-    }
-
-    async function runQlooLifestyleAnalysis() {
-      const p = selectedPatient;
-      workspacePanel.classList.add('visible');
-
-      let container = document.getElementById('qlooLiveContainer');
-      if (!container) {
-        workspacePanel.innerHTML = `<div id="qlooLiveContainer"></div>`;
-        container = document.getElementById('qlooLiveContainer');
+    // Send Message / Chat Interaction
+    async function handleSendMessage() {
+      const text = promptInput.value.trim();
+      if (!text && !activePatient) {
+        // If empty on start, default to Chinedu
+        activePatient = PATIENTS[0];
+      } else if (!activePatient) {
+        activePatient = PATIENTS[0];
       }
 
-      container.innerHTML = `
-        <div class="qloo-results-box">
-          <span style="color:var(--text-secondary);">Querying Qloo Taste AI Graph for ${p.name}...</span>
+      const userText = text || `Analyze lifestyle and diagnostic questions for ${activePatient.name}`;
+      promptInput.value = '';
+
+      if (!CHAT_HISTORY[activePatient.id]) {
+        CHAT_HISTORY[activePatient.id] = [];
+      }
+
+      // Add user message to history
+      CHAT_HISTORY[activePatient.id].push({
+        role: 'user',
+        text: userText
+      });
+
+      // Switch to Chat mode and render
+      currentMode = 'Chat';
+      modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
+      renderChatThread();
+
+      // Show typing indicator in assistant bubble
+      const thread = document.getElementById('chatThread');
+      const tempId = 'temp-' + Date.now();
+      const typingEl = document.createElement('div');
+      typingEl.className = 'message-row assistant';
+      typingEl.id = tempId;
+      typingEl.innerHTML = `
+        <div class="assistant-bubble">
+          <div class="assistant-bubble-header">
+            <span>Querying Qloo Taste AI Graph...</span>
+          </div>
+          <p style="color:var(--text-secondary);">Connecting to <code>hackathon.api.qloo.com</code> for ${activePatient.name}'s peer demographic in ${activePatient.location}...</p>
         </div>
       `;
+      thread.appendChild(typingEl);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
       try {
         const res = await fetch(
-          `/api/qloo/lifestyle?location=${encodeURIComponent(p.qlooLocation)}&age=${encodeURIComponent(p.qlooAge)}&gender=${encodeURIComponent(p.qlooGender)}&tagQuery=${encodeURIComponent(p.qlooTagQuery)}`
+          `/api/qloo/lifestyle?location=${encodeURIComponent(activePatient.qlooLocation)}&age=${encodeURIComponent(activePatient.qlooAge)}&gender=${encodeURIComponent(activePatient.qlooGender)}&tagQuery=${encodeURIComponent(activePatient.qlooTagQuery)}`
         );
         const qloo = await res.json();
 
-        const livePlaces = (qloo.places || []).slice(0, 4).map((pl) => `<span class="qloo-chip">📍 ${pl.name}</span>`).join('');
-        const liveBrands = (qloo.brands || []).slice(0, 4).map((br) => `<span class="qloo-chip">🏷️ ${br.name}</span>`).join('');
-        const liveTags = (qloo.tags || []).slice(0, 4).map((tg) => `<span class="qloo-chip"># ${tg.name}</span>`).join('');
+        const places = (qloo.places || []).slice(0, 4).map((p) => p.name);
+        const brands = (qloo.brands || []).slice(0, 4).map((b) => b.name);
+        const tags = (qloo.tags || []).slice(0, 4).map((t) => t.name);
 
-        container.innerHTML = `
-          <div class="qloo-results-box">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-              <strong style="font-size:13.5px;">Peer Lifestyle &amp; Environment (${p.location})</strong>
-              <span style="font-size:11.5px;color:var(--text-secondary);">Qloo API Connected</span>
-            </div>
-            <ul style="padding-left:18px;margin-bottom:10px;color:var(--text-primary);">
-              ${p.lifestyleSummary.map((item) => `<li style="margin-bottom:4px;">${item}</li>`).join('')}
-            </ul>
+        const assistantResponse = {
+          role: 'assistant',
+          patientName: activePatient.name,
+          location: activePatient.location,
+          places,
+          brands,
+          tags,
+          lifestyle: activePatient.lifestyleSummary,
+          questions: activePatient.diagnosticQuestions
+        };
 
-            <div style="font-size:11.5px;color:var(--text-secondary);margin-top:6px;">Qloo Entities Retrieved:</div>
-            <div class="qloo-chip-row">
-              ${livePlaces || '<span class="qloo-chip">📍 Local City Venues</span>'}
-              ${liveBrands}
-              ${liveTags}
-            </div>
-
-            <div style="margin-top:14px;">
-              <strong style="font-size:13.5px;">Lifestyle Questions to Ask ${p.name.split(' ')[0]}</strong>
-              ${p.diagnosticQuestions
-                .map(
-                  (dq) => `
-                  <div class="question-card">
-                    <div style="font-size:11px;color:var(--text-secondary);font-weight:500;margin-bottom:2px;">PROBE: ${dq.trigger.toUpperCase()}</div>
-                    <div style="font-weight:500;margin-bottom:3px;color:var(--text-primary);">${dq.question}</div>
-                    <div style="font-size:11.5px;color:var(--text-secondary);">${dq.clinicalWhy}</div>
-                  </div>
-                `
-                )
-                .join('')}
-            </div>
-          </div>
-        `;
+        // Replace typing indicator with response
+        CHAT_HISTORY[activePatient.id].push(assistantResponse);
+        const el = document.getElementById(tempId);
+        if (el) el.remove();
+        renderChatThread();
       } catch (err) {
-        container.innerHTML = `<div class="qloo-results-box">Error contacting Qloo: ${err.message}</div>`;
+        const el = document.getElementById(tempId);
+        if (el) {
+          el.innerHTML = `
+            <div class="assistant-bubble">
+              <p style="color:red;">Error connecting to Qloo API: ${escapeHtml(err.message)}</p>
+            </div>
+          `;
+        }
       }
     }
+
+    sendBtn.addEventListener('click', handleSendMessage);
+    promptInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    });
 
     // Toggle [ Chat | Details ]
     const modeButtons = document.querySelectorAll('#modeToggle .seg-btn');
@@ -1136,26 +1444,29 @@
         modeButtons.forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         currentMode = btn.dataset.mode;
+
         if (currentMode === 'Details') {
           renderDetailsPanel();
         } else {
-          runQlooLifestyleAnalysis();
+          if (activePatient) {
+            renderChatThread();
+          } else {
+            workspacePanel.classList.remove('visible');
+          }
         }
       });
     });
 
-    sendBtn.addEventListener('click', () => {
-      runQlooLifestyleAnalysis();
-    });
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
 
-    promptInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        runQlooLifestyleAnalysis();
-      }
-    });
-
-    // Initial render
+    // Initial render: empty state with sidebar list ready
     renderPatientList();
   </script>
 </body>
