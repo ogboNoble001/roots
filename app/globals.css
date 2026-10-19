@@ -1,0 +1,69 @@
+@font-face {
+  font-family: 'The Silver Editorial';
+  src: url('/fonts/TheSilverEditorial-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'The Silver Editorial';
+  src: url('/fonts/TheSilverEditorial-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('https://db.onlinewebfonts.com/t/860c3ec7bbc5da3e97233ccecafe512e.woff2') format('woff2'),
+       url('https://db.onlinewebfonts.com/t/860c3ec7bbc5da3e97233ccecafe512e.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Circular Std';
+  src: url('https://db.onlinewebfonts.com/t/9475d6a0b79c164f9f605673714e75d9.woff2') format('woff2'),
+       url('https://db.onlinewebfonts.com/t/9475d6a0b79c164f9f605673714e75d9.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-cream: #F7F4EC;
+  --surface-box: #EFECE3;
+  --border-subtle: rgba(31, 29, 25, 0.13);
+  --border-focus: rgba(31, 29, 25, 0.24);
+  --text-primary: #1F1E1B;
+  --text-secondary: #6E6B63;
+  --text-placeholder: #8A867D;
+  --accent-starburst: #D97757;
+  --accent-link: #4C7BD9;
+  --pill-bg: #E8E4DA;
+  --pill-active: #DAD5C8;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-cream);
+  color: var(--text-primary);
+  font-family: 'Circular Std', 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.serif-header {
+  font-family: 'The Silver Editorial', Georgia, serif;
+  font-weight: 400;
+}
