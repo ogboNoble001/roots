@@ -298,14 +298,14 @@ export default function HomePage() {
           <h1
             className="serif-header"
             style={{
-              fontSize: '44px',
-              lineHeight: 1.1,
-              letterSpacing: '-0.02em',
+              fontSize: '38px',
+              lineHeight: 1.15,
+              letterSpacing: '-0.022em',
               color: 'var(--text-primary)',
               fontWeight: 400,
             }}
           >
-            Back at it, Noble
+            Good morning, Doctor Noble
           </h1>
         </div>
 
