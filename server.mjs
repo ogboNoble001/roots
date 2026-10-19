@@ -6,10 +6,43 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Load .env.local if present
+function loadEnv() {
+  const envPath = path.join(__dirname, '.env.local');
+  if (fs.existsSync(envPath)) {
+    const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+    for (const line of lines) {
+      const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+      if (match) {
+        const key = match[1];
+        let val = (match[2] || '').trim();
+        val = val.replace(/(^['"]|['"]$)/g, '');
+        if (!process.env[key]) {
+          process.env[key] = val;
+        }
+      }
+    }
+  }
+}
+loadEnv();
+
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const QLOO_API_KEY = process.env.QLOO_API_KEY || 'hack_79608ef0cbb3f7d7c60a9d6dee03ac2d6cf6deef';
 const QLOO_BASE_URL = process.env.QLOO_API_BASE_URL || 'https://hackathon.api.qloo.com';
+
+const GEMINI_KEYS = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
+  .split(',')
+  .map((k) => k.trim())
+  .filter(Boolean);
+
+let activeGeminiKeyIndex = 0;
+function getNextGeminiKey() {
+  if (GEMINI_KEYS.length === 0) return '';
+  const key = GEMINI_KEYS[activeGeminiKeyIndex % GEMINI_KEYS.length];
+  activeGeminiKeyIndex = (activeGeminiKeyIndex + 1) % GEMINI_KEYS.length;
+  return key;
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -40,7 +73,7 @@ async function fetchQlooEndpoint(endpointPath, params = {}) {
       method: 'GET',
       headers: {
         'X-Api-Key': QLOO_API_KEY,
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
       signal: controller.signal,
     });
@@ -53,10 +86,105 @@ async function fetchQlooEndpoint(endpointPath, params = {}) {
   }
 }
 
+async function queryGeminiClinicalReasoning(patient, message, qlooData) {
+  const apiKey = getNextGeminiKey();
+  const placesList = (qlooData.places || []).map((p) => `${p.name} (affinity ${p.affinity}%)`).join(', ');
+  const brandsList = (qlooData.brands || []).map((b) => b.name).join(', ');
+  const tagsList = (qlooData.tags || []).map((t) => t.name).join(', ');
+
+  const systemInstruction = `You are Roots, an objective Clinical Lifestyle Intelligence organizer collaborating with attending physician Dr. Aryta.
+CRITICAL SAFETY & CLINICAL BOUNDARY:
+- You do NOT give medical advice or clinical diagnosis.
+- You must NEVER state, diagnose, or hint at what disease or medical condition is wrong with the patient.
+- Your sole job is to take the peer lifestyle, dietary, transit, and cultural attributes retrieved from the Qloo Taste Graph and organize them into clear, objective anamnesis lifestyle factors and questions for Dr. Aryta to ask during examination.
+
+PATIENT FILE:
+- Name: ${patient.name} (${patient.age}y, ${patient.sex})
+- Location: ${patient.location}
+- Occupation: ${patient.occupation}
+- Marital/Social: ${patient.maritalStatus}
+- Chief Complaint: ${patient.chiefComplaint}
+- Triage Vitals: ${patient.vitals}
+- Baseline Lifestyle: ${(patient.lifestyleSummary || []).join('; ')}
+
+LIVE QLOO DEMOGRAPHIC & CULTURAL TASTE SIGNALS:
+- Local Venues / Food Spots / Staples: ${placesList || 'Regional markets and transit hubs'}
+- Peer Consumer Brands: ${brandsList || 'Regional food and beverage staples'}
+- Cultural & Recreational Tags: ${tagsList || 'Recreation, commuter transit, street food'}
+
+DOCTOR ARYTA'S MESSAGE:
+"${message}"
+
+INSTRUCTIONS:
+Organize the Qloo lifestyle attributes into this exact JSON schema (do not include medical diagnosis):
+{
+  "clinicalAnalysis": "A neutral, objective summary organizing the patient's lifestyle context (routines, transit, local foods) in relation to Dr. Aryta's query without claiming any diagnosis.",
+  "lifestyleFactors": [
+    "Specific lifestyle/environmental attribute 1 from Qloo/patient context",
+    "Specific lifestyle/environmental attribute 2 from Qloo/patient context"
+  ],
+  "diagnosticQuestions": [
+    {
+      "trigger": "Short lifestyle probe name (e.g. 'Daily Commute & Road Jolting' or 'Dietary Intake & Local Staples')",
+      "question": "The exact objective lifestyle question Dr. Aryta can ask the patient about their routine",
+      "clinicalWhy": "The objective anamnesis purpose (e.g. 'Clarifies daily mechanical jarring on transit vs. dietary exposure')"
+    }
+  ]
+}`;
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: systemInstruction }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.3,
+          },
+        }),
+        signal: controller.signal,
+      }
+    );
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      throw new Error(`Gemini API returned status ${res.status}`);
+    }
+
+    const json = await res.json();
+    const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (rawText) {
+      return JSON.parse(rawText);
+    }
+    throw new Error('Empty response from Gemini');
+  } catch (err) {
+    clearTimeout(timeout);
+    console.warn('Gemini query failed, using clinical fallback engine:', err.message);
+    return null;
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host}`);
 
-  // Live Qloo API proxy endpoint for Roots Lifestyle Intelligence
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  // Live Qloo API proxy endpoint for demographic & lifestyle insights
   if (reqUrl.pathname === '/api/qloo/lifestyle' && req.method === 'GET') {
     const location = reqUrl.searchParams.get('location') || 'Enugu';
     const ageGroup = reqUrl.searchParams.get('age') || '24_and_younger';
@@ -107,7 +235,6 @@ const server = http.createServer(async (req, res) => {
       JSON.stringify({
         success: true,
         qlooServer: QLOO_BASE_URL,
-        queries: [placesRes.url, brandsRes.url, tagsRes.url],
         places,
         brands,
         tags,
@@ -116,6 +243,102 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Full Agentic Chat Endpoint (Qloo Graph Grounding + Gemini 2.5 Flash Reasoning)
+  if (reqUrl.pathname === '/api/roots/chat' && req.method === 'POST') {
+    let body = '';
+    req.on('data', (chunk) => (body += chunk));
+    req.on('end', async () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const patient = payload.patient || {};
+        const message = payload.message || 'Analyze clinical lifestyle factors';
+
+        const location = patient.qlooLocation || 'Enugu';
+        const ageGroup = patient.qlooAge || '24_and_younger';
+        const gender = patient.qlooGender || 'male';
+        const tagQuery = patient.qlooTagQuery || 'sport';
+
+        // 1. Fetch live Qloo entities for this patient
+        const [placesRes, brandsRes, tagsRes] = await Promise.all([
+          fetchQlooEndpoint('/v2/insights', {
+            'filter.type': 'urn:entity:place',
+            'filter.location.query': location,
+            'signal.demographics.age': ageGroup,
+            'signal.demographics.gender': gender,
+            'take': 6,
+          }),
+          fetchQlooEndpoint('/v2/insights', {
+            'filter.type': 'urn:entity:brand',
+            'signal.demographics.age': ageGroup,
+            'signal.demographics.gender': gender,
+            'take': 6,
+          }),
+          fetchQlooEndpoint('/v2/tags', {
+            'filter.query': tagQuery,
+            'feature.typo_tolerance': 'true',
+            'take': 6,
+          }),
+        ]);
+
+        const places = (placesRes?.data?.results?.entities || []).map((e) => ({
+          name: e.name,
+          id: e.entity_id,
+          affinity: e.query?.affinity ? Math.round(e.query.affinity * 100) : null,
+        }));
+
+        const brands = (brandsRes?.data?.results?.entities || []).map((e) => ({
+          name: e.name,
+          id: e.entity_id,
+          affinity: e.query?.affinity ? Math.round(e.query.affinity * 100) : null,
+        }));
+
+        const tags = (tagsRes?.data?.results?.tags || []).map((t) => ({
+          name: t.name,
+          id: t.tag_id || t.id,
+        }));
+
+        // 2. Query Gemini 2.5 Flash with Qloo Grounding
+        const geminiResult = await queryGeminiClinicalReasoning(patient, message, { places, brands, tags });
+
+        const analysis =
+          geminiResult?.clinicalAnalysis ||
+          `Dr. Aryta, ${patient.name}'s presentation requires cross-referencing acute symptoms against their regional lifestyle in ${patient.location}. The peer demographic signals highlight local mobility and recreational exertion as critical anamnesis targets.`;
+
+        const lifestyleFactors =
+          geminiResult?.lifestyleFactors && geminiResult.lifestyleFactors.length > 0
+            ? geminiResult.lifestyleFactors
+            : patient.lifestyleSummary || [
+                `Local peer activity patterns in ${patient.location}`,
+                `Regional dietary staples and commuter factors`,
+              ];
+
+        const diagnosticQuestions =
+          geminiResult?.diagnosticQuestions && geminiResult.diagnosticQuestions.length > 0
+            ? geminiResult.diagnosticQuestions
+            : patient.diagnosticQuestions || [];
+
+        res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(
+          JSON.stringify({
+            success: true,
+            provider: geminiResult ? 'gemini-2.5-flash + qloo' : 'qloo-clinical-engine',
+            analysis,
+            lifestyleFactors,
+            diagnosticQuestions,
+            places,
+            brands,
+            tags,
+          })
+        );
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Static File Server
   let pathname = reqUrl.pathname === '/' ? '/index.html' : reqUrl.pathname;
   const filePath = path.join(PUBLIC_DIR, pathname);
 

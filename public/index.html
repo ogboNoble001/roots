@@ -1815,6 +1815,7 @@
                   <div class="assistant-bubble-header">
                     <span>Roots Clinical Agent · Qloo Taste AI (${msg.location || activePatient.location})</span>
                   </div>
+                  ${msg.analysis ? `<div style="font-size:13.5px;color:var(--text-primary);line-height:1.55;margin-bottom:12px;">${escapeHtml(msg.analysis)}</div>` : ''}
                   <div>
                     <strong style="color:var(--text-primary);">Peer Lifestyle &amp; Environmental Factors:</strong>
                     <ul style="padding-left:18px;margin:6px 0 10px 0;color:var(--text-secondary);">
@@ -1930,24 +1931,30 @@
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
       try {
-        const res = await fetch(
-          `/api/qloo/lifestyle?location=${encodeURIComponent(activePatient.qlooLocation)}&age=${encodeURIComponent(activePatient.qlooAge)}&gender=${encodeURIComponent(activePatient.qlooGender)}&tagQuery=${encodeURIComponent(activePatient.qlooTagQuery)}`
-        );
-        const qloo = await res.json();
+        const res = await fetch('/api/roots/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patient: activePatient,
+            message: userText
+          })
+        });
+        const data = await res.json();
 
-        const places = (qloo.places || []).slice(0, 4).map((p) => p.name);
-        const brands = (qloo.brands || []).slice(0, 4).map((b) => b.name);
-        const tags = (qloo.tags || []).slice(0, 4).map((t) => t.name);
+        const places = (data.places || []).slice(0, 4).map((p) => p.name);
+        const brands = (data.brands || []).slice(0, 4).map((b) => b.name);
+        const tags = (data.tags || []).slice(0, 4).map((t) => t.name);
 
         const assistantResponse = {
           role: 'assistant',
           patientName: activePatient.name,
           location: activePatient.location,
+          analysis: data.analysis,
           places,
           brands,
           tags,
-          lifestyle: activePatient.lifestyleSummary,
-          questions: activePatient.diagnosticQuestions
+          lifestyle: data.lifestyleFactors && data.lifestyleFactors.length > 0 ? data.lifestyleFactors : activePatient.lifestyleSummary,
+          questions: data.diagnosticQuestions && data.diagnosticQuestions.length > 0 ? data.diagnosticQuestions : activePatient.diagnosticQuestions
         };
 
         CHAT_HISTORY[activePatient.id].push(assistantResponse);
