@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roots — Clinical Lifestyle Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <style>
     /* Bundled Local New York Serif */
     @font-face {
@@ -40,18 +41,18 @@
     }
 
     :root {
-      /* Crisp Neutral Black & White Palette with Muted Accents */
-      --bg-main: #FFFFFF;
-      --bg-sidebar: #FAFAFA;
-      --surface-box: #F4F4F5;
+      /* Crisp Neutral Black & White Palette with Muted Accents & Non-White Subtle Canvas */
+      --bg-main: #F7F7F8;
+      --bg-sidebar: #F0F0F2;
+      --surface-box: #EEEEF1;
       --surface-card: #FFFFFF;
-      --surface-avatar: #EEEEF0;
-      --border-subtle: #E4E4E7;
+      --surface-avatar: #E4E4E7;
+      --border-subtle: #E2E2E5;
       --border-focus: #18181B;
       --text-primary: #09090B;
       --text-secondary: #71717A;
       --text-placeholder: #A1A1AA;
-      --pill-bg: #F4F4F5;
+      --pill-bg: #E8E8EC;
       --pill-active: #09090B;
       --pill-active-text: #FFFFFF;
     }
@@ -233,18 +234,33 @@
     }
 
     .patient-avatar {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
+      overflow: hidden;
+      position: relative;
+      background-color: var(--surface-avatar);
+      border: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .patient-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .patient-avatar-fallback {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 12px;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--text-primary);
       background-color: var(--surface-avatar);
-      border: 1px solid var(--border-subtle);
-      flex-shrink: 0;
     }
 
     .patient-info {
@@ -341,31 +357,144 @@
       display: inline-block;
     }
 
-    /* Doctor Profile Badge on Top Right */
+    /* Doctor Profile Badge on Top Right & Dropdown */
+    .doc-profile-wrapper {
+      position: relative;
+    }
+
     .doc-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 5px 11px 5px 6px;
+      gap: 7px;
+      padding: 3px 10px 3px 4px;
       border-radius: 999px;
       border: 1px solid var(--border-subtle);
-      background-color: var(--surface-box);
+      background-color: var(--surface-card);
       cursor: pointer;
       font-family: 'Circular Std', sans-serif;
       font-size: 12.5px;
       color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .doc-badge:hover {
+      background-color: var(--surface-box);
+      border-color: #D4D4D8;
+    }
+
+    .doc-avatar-img {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
     }
 
     .doc-avatar-circle {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background-color: var(--bg-main);
+      background-color: var(--surface-avatar);
       border: 1px solid var(--border-subtle);
       color: var(--text-primary);
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 10.5px;
+      font-weight: 700;
+    }
+
+    .doc-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 234px;
+      background-color: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+      padding: 8px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-6px) scale(0.98);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .doc-dropdown-menu.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .dropdown-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 10px 10px;
+    }
+
+    .dropdown-avatar-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .dropdown-header-info {
+      overflow: hidden;
+    }
+
+    .dropdown-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .dropdown-role {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dropdown-email {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: var(--border-subtle);
+      margin: 4px 6px;
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .dropdown-item:hover {
+      background-color: var(--surface-box);
+    }
+
+    .dropdown-item.sign-out-item {
+      color: #DC2626;
+    }
+
+    .dropdown-item.sign-out-item:hover {
+      background-color: #FEF2F2;
     }
 
     /* Main Stage */
@@ -796,6 +925,130 @@
       font-size: 13px;
     }
 
+    .modal-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-avatar-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Patient Picker / Selection Modal */
+    .select-modal-header {
+      margin-bottom: 18px;
+      padding-right: 28px;
+    }
+
+    .select-modal-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .select-modal-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .select-patient-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 58vh;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .select-patient-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--surface-card);
+      cursor: pointer;
+      text-align: left;
+      font-family: 'Circular Std', sans-serif;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .select-patient-card:hover {
+      background-color: var(--surface-box);
+      border-color: #D4D4D8;
+      transform: translateY(-1px);
+    }
+
+    .select-patient-card .card-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+      background-color: var(--surface-avatar);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .select-patient-card .card-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .select-patient-card .card-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .select-patient-card .card-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .select-patient-card .card-age {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .select-patient-card .card-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    .select-patient-card .card-complaint {
+      font-size: 12px;
+      color: var(--text-primary);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .select-patient-card .card-select-btn {
+      font-size: 11.5px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background-color: var(--text-primary);
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
     /* Responsive Design */
     @media (max-width: 640px) {
       .serif-header {
@@ -884,18 +1137,53 @@
           <span class="header-chat-title" id="headerChatTitle"></span>
         </div>
 
-        <!-- Doctor Profile Badge on Top Right -->
-        <div class="doc-badge" title="Attending Physician: Dr. Noble">
-          <div class="doc-avatar-circle">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11 2v2" />
-              <path d="M5 2v2" />
-              <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 12 0V5a2 2 0 0 0-2-2h-1" />
-              <path d="M8 15a6 6 0 0 0 12 0v-3" />
-              <circle cx="20" cy="10" r="2" />
+        <!-- Doctor Profile Badge on Top Right with Dropdown -->
+        <div class="doc-profile-wrapper">
+          <button type="button" class="doc-badge" id="docProfileBtn" title="Attending Physician: Dr. Aryta" aria-label="Physician Profile">
+            <img
+              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&auto=format&fit=crop&q=80"
+              alt="Dr. Aryta"
+              class="doc-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            />
+            <div class="doc-avatar-circle" style="display: none;">DA</div>
+            <span style="font-weight: 500;">Dr. Aryta</span>
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-left: 1px; color: var(--text-secondary);">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
+          </button>
+
+          <!-- Dropdown Popover Menu -->
+          <div class="doc-dropdown-menu" id="docDropdownMenu">
+            <div class="dropdown-header">
+              <img
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&auto=format&fit=crop&q=80"
+                alt="Dr. Aryta"
+                class="dropdown-avatar-img"
+              />
+              <div class="dropdown-header-info">
+                <div class="dropdown-name">Dr. Aryta</div>
+                <div class="dropdown-role">Attending Physician · Clinical AI</div>
+                <div class="dropdown-email">aryta@clinic.roots.ai</div>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item" id="clinicSettingsItem">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              <span>Clinic Settings</span>
+            </div>
+            <div class="dropdown-item sign-out-item" id="signOutBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>Sign out</span>
+            </div>
           </div>
-          <span style="font-weight: 500;">Dr. Noble</span>
         </div>
       </header>
 
@@ -920,7 +1208,7 @@
               <path d="M36 7C39 10 42 14 44 19" />
             </g>
           </svg>
-          <h1 class="serif-header">Good morning, Doctor Noble</h1>
+          <h1 class="serif-header" id="heroGreetingText">Good morning, Aryta</h1>
         </div>
 
         <!-- Chat Conversation Messages Thread -->
@@ -981,6 +1269,22 @@
         <div id="detailsModalBody"></div>
       </div>
     </div>
+
+    <!-- Patient Selection Modal Backdrop & Dialog -->
+    <div class="details-modal-backdrop" id="selectPatientModalBackdrop">
+      <div class="details-modal" style="max-width: 580px;" id="selectPatientModal">
+        <button type="button" class="modal-close-btn" id="closeSelectPatientModalBtn" aria-label="Close patient selection">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="select-modal-header">
+          <h2 class="select-modal-title">Select a Patient</h2>
+          <p class="select-modal-sub" id="selectModalSubtitle">Choose a patient from your clinic queue to begin or view lifestyle anamnesis.</p>
+        </div>
+        <div class="select-patient-grid" id="selectPatientGrid"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -990,6 +1294,7 @@
         id: 'PT-2041',
         initials: 'CO',
         name: 'Chinedu Okafor',
+        avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&auto=format&fit=crop&q=80',
         age: 19,
         sex: 'Male',
         qlooAge: '24_and_younger',
@@ -1029,6 +1334,7 @@
         id: 'PT-2038',
         initials: 'TA',
         name: 'Tunde Adeyemi',
+        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
         age: 46,
         sex: 'Male',
         qlooAge: '36_to_55',
@@ -1063,6 +1369,7 @@
         id: 'PT-2035',
         initials: 'ML',
         name: 'Maya Lin',
+        avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
         age: 23,
         sex: 'Female',
         qlooAge: '24_and_younger',
@@ -1097,6 +1404,7 @@
         id: 'PT-2029',
         initials: 'AN',
         name: 'Amara Nwosu',
+        avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
         age: 64,
         sex: 'Female',
         qlooAge: '55_and_older',
@@ -1187,6 +1495,65 @@
     const closeDetailsModalBtn = document.getElementById('closeDetailsModalBtn');
     const detailsModalBody = document.getElementById('detailsModalBody');
 
+    // Patient Selection Modal Elements
+    const selectPatientModalBackdrop = document.getElementById('selectPatientModalBackdrop');
+    const closeSelectPatientModalBtn = document.getElementById('closeSelectPatientModalBtn');
+    const selectPatientGrid = document.getElementById('selectPatientGrid');
+    const selectModalSubtitle = document.getElementById('selectModalSubtitle');
+    let pendingModalAction = null; // 'view-details' | 'send-message'
+    let pendingPromptText = '';
+
+    // Doctor Profile Dropdown Elements
+    const docProfileBtn = document.getElementById('docProfileBtn');
+    const docDropdownMenu = document.getElementById('docDropdownMenu');
+    const signOutBtn = document.getElementById('signOutBtn');
+    const clinicSettingsItem = document.getElementById('clinicSettingsItem');
+
+    // Time-based Dynamic Greeting ("Good morning, Aryta" / "Good afternoon, Aryta" / "Good evening, Aryta")
+    function updateGreeting() {
+      const hour = new Date().getHours();
+      let timeGreeting = 'Good morning, Aryta';
+      if (hour >= 12 && hour < 17) {
+        timeGreeting = 'Good afternoon, Aryta';
+      } else if (hour >= 17) {
+        timeGreeting = 'Good evening, Aryta';
+      }
+      const el = document.getElementById('heroGreetingText');
+      if (el) {
+        el.textContent = timeGreeting;
+      }
+    }
+
+    // Doctor Profile Dropdown Events
+    if (docProfileBtn && docDropdownMenu) {
+      docProfileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        docDropdownMenu.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!docDropdownMenu.contains(e.target) && !docProfileBtn.contains(e.target)) {
+          docDropdownMenu.classList.remove('open');
+        }
+      });
+
+      if (signOutBtn) {
+        signOutBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          docDropdownMenu.classList.remove('open');
+          alert('Sign out: Dr. Aryta session ended. Session authentication can be linked here.');
+        });
+      }
+
+      if (clinicSettingsItem) {
+        clinicSettingsItem.addEventListener('click', (e) => {
+          e.stopPropagation();
+          docDropdownMenu.classList.remove('open');
+          alert('Clinic Settings: Roots Clinical Lifestyle Intelligence v2.0 is active.');
+        });
+      }
+    }
+
     function toggleSidebar(open) {
       const isOpen = typeof open === 'boolean' ? open : !sidebar.classList.contains('open');
       sidebar.classList.toggle('open', isOpen);
@@ -1210,19 +1577,94 @@
         closeDetailsModal();
       }
     });
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && detailsModalBackdrop.classList.contains('open')) {
-        closeDetailsModal();
+
+    function closeSelectPatientModal() {
+      selectPatientModalBackdrop.classList.remove('open');
+      pendingModalAction = null;
+      pendingPromptText = '';
+    }
+
+    closeSelectPatientModalBtn.addEventListener('click', closeSelectPatientModal);
+    selectPatientModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === selectPatientModalBackdrop) {
+        closeSelectPatientModal();
       }
     });
 
-    // Details Modal with Stylized Top Profile and Pure Whitespace 2-Column Grid
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (detailsModalBackdrop.classList.contains('open')) closeDetailsModal();
+        if (selectPatientModalBackdrop.classList.contains('open')) closeSelectPatientModal();
+        if (docDropdownMenu.classList.contains('open')) docDropdownMenu.classList.remove('open');
+      }
+    });
+
+    // Patient Selection Modal (shown when clicking Details or sending without an active consultation)
+    function openSelectPatientModal(action = 'view-details', text = '') {
+      pendingModalAction = action;
+      pendingPromptText = text;
+
+      if (action === 'view-details') {
+        selectModalSubtitle.textContent = 'Choose a patient from your clinic queue to view their personal lifestyle profile.';
+      } else {
+        selectModalSubtitle.textContent = 'Choose which patient to attach this consultation query and lifestyle analysis to.';
+      }
+
+      selectPatientGrid.innerHTML = PATIENTS.map((p) => `
+        <button type="button" class="select-patient-card" data-id="${p.id}">
+          <img src="${p.avatarUrl}" alt="${p.name}" class="card-avatar" onerror="this.src='';this.alt='${p.initials}';" />
+          <div class="card-info">
+            <div class="card-name-row">
+              <span class="card-name">${p.name}</span>
+              <span class="card-age">${p.age}y · ${p.sex}</span>
+            </div>
+            <div class="card-meta">${p.location}</div>
+            <div class="card-complaint">Complaint: ${p.chiefComplaint}</div>
+          </div>
+          <span class="card-select-btn">Select</span>
+        </button>
+      `).join('');
+
+      selectPatientGrid.querySelectorAll('.select-patient-card').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const found = PATIENTS.find((pt) => pt.id === btn.dataset.id);
+          if (found) {
+            const act = pendingModalAction;
+            const txt = pendingPromptText;
+            closeSelectPatientModal();
+            selectPatientChat(found);
+
+            if (act === 'view-details') {
+              openDetailsModal();
+            } else if (txt) {
+              handleSendMessage(txt);
+            }
+          }
+        });
+      });
+
+      selectPatientModalBackdrop.classList.add('open');
+    }
+
+    // Details Modal with Centered Profile and Personal Details Only (Clinical details removed)
     function openDetailsModal() {
-      const p = activePatient || PATIENTS[0];
+      if (!activePatient) {
+        openSelectPatientModal('view-details');
+        return;
+      }
+      const p = activePatient;
 
       detailsModalBody.innerHTML = `
         <div class="modal-profile-header">
-          <div class="modal-profile-avatar">${p.initials}</div>
+          <div class="modal-profile-avatar">
+            <img
+              src="${p.avatarUrl}"
+              alt="${p.name}"
+              class="modal-avatar-img"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            />
+            <div class="modal-avatar-fallback" style="display: none;">${p.initials}</div>
+          </div>
           <div class="modal-patient-name">${p.name}</div>
           <div class="modal-badge-row">
             <span class="modal-tag">Patient #${p.id}</span>
@@ -1231,8 +1673,8 @@
           </div>
         </div>
 
-        <div class="modal-columns-wrap">
-          <!-- Column 1: Personal Details (Bold title, clean separation by spacing) -->
+        <div class="modal-columns-wrap" style="grid-template-columns: 1fr; max-width: 480px; margin: 26px auto 0 auto;">
+          <!-- Personal Details Only (Pure Typography & Generous Spacing) -->
           <div class="modal-col">
             <h3 class="col-section-title">Personal details</h3>
 
@@ -1261,31 +1703,6 @@
               <div class="detail-content">${p.lifestyleSummary[0]}</div>
             </div>
           </div>
-
-          <!-- Column 2: Clinical Details (Bold title, clean separation by spacing) -->
-          <div class="modal-col">
-            <h3 class="col-section-title">Clinical details</h3>
-
-            <div class="detail-block">
-              <div class="detail-label">Triage Vitals</div>
-              <div class="detail-content">${p.vitals}</div>
-            </div>
-
-            <div class="detail-block">
-              <div class="detail-label">Chief Complaint</div>
-              <div class="detail-content">${p.chiefComplaint}</div>
-            </div>
-
-            <div class="detail-block">
-              <div class="detail-label">Triage Observations</div>
-              <div class="detail-content">${p.triageNote}</div>
-            </div>
-
-            <div class="detail-block">
-              <div class="detail-label">Qloo Lifestyle Link</div>
-              <div class="detail-content">${p.diagnosticQuestions[0]?.clinicalWhy || 'Peer-group lifestyle signals cross-referenced against symptom presentation.'}</div>
-            </div>
-          </div>
         </div>
       `;
 
@@ -1301,6 +1718,7 @@
       // Center stage & show hero
       mainStage.classList.add('empty-state');
       heroGreeting.classList.remove('hidden');
+      updateGreeting();
       chatThread.classList.remove('visible');
       chatThread.innerHTML = '';
       composerContainer.classList.remove('docked-bottom');
@@ -1405,7 +1823,7 @@
                   </div>
                   ${chips ? `<div class="qloo-chip-row">${chips}</div>` : ''}
                   <div style="margin-top:14px;">
-                    <strong style="color:var(--text-primary);">Diagnostic Questions for Dr. Noble:</strong>
+                    <strong style="color:var(--text-primary);">Diagnostic Questions for Dr. Aryta:</strong>
                     ${questionsHtml}
                   </div>
                 </div>
@@ -1433,7 +1851,15 @@
           const isActive = activePatient && p.id === activePatient.id;
           return `
             <button type="button" class="patient-item ${isActive ? 'active' : ''}" data-id="${p.id}">
-              <div class="patient-avatar">${p.initials}</div>
+              <div class="patient-avatar">
+                <img
+                  src="${p.avatarUrl}"
+                  alt="${p.name}"
+                  class="patient-avatar-img"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                />
+                <div class="patient-avatar-fallback" style="display: none;">${p.initials}</div>
+              </div>
               <div class="patient-info">
                 <div class="patient-name-row">
                   <span class="patient-name">${p.name}</span>
@@ -1462,52 +1888,16 @@
     });
 
     // Send Message / Chat Interaction
-    async function handleSendMessage() {
-      const text = promptInput.value.trim();
-      
-      // If no patient is currently selected (e.g. from New Consultation), create one dynamically!
+    async function handleSendMessage(overrideText = '') {
+      const rawText = typeof overrideText === 'string' && overrideText ? overrideText : promptInput.value.trim();
+
+      // If no patient is currently selected when sending, open the Patient Picker modal!
       if (!activePatient) {
-        if (!text) {
-          activePatient = PATIENTS[0];
-        } else {
-          // Detect or create new consultation patient from prompt
-          const newId = 'PT-' + Math.floor(2050 + Math.random() * 50);
-          const firstWord = text.split(' ')[0] || 'Patient';
-          const newPt = {
-            id: newId,
-            initials: firstWord.slice(0, 2).toUpperCase(),
-            name: text.length > 28 ? text.slice(0, 28) + '...' : text,
-            age: 32,
-            sex: 'Patient',
-            qlooAge: '24_and_younger',
-            qlooGender: 'male',
-            qlooLocation: 'Enugu',
-            qlooTagQuery: 'lifestyle',
-            maritalStatus: 'Consultation Intake',
-            occupation: 'New Consultation Case',
-            location: 'Client Intake Environment',
-            vitals: 'Vitals pending examination',
-            chiefComplaint: text,
-            triageNote: text,
-            lifestyleSummary: [
-              'Daily environmental & peer cohort factors being analyzed via Qloo',
-              'Regional food, recreational, and commute habits'
-            ],
-            diagnosticQuestions: [
-              {
-                trigger: 'Initial Lifestyle Anamnesis',
-                question: `"How long have these symptoms been present, and do they change based on your daily physical routine or meals?"`,
-                clinicalWhy: 'Gathers baseline temporal and lifestyle triggers.'
-              }
-            ]
-          };
-          PATIENTS.unshift(newPt);
-          activePatient = newPt;
-          renderPatientList();
-        }
+        openSelectPatientModal('send-message', rawText);
+        return;
       }
 
-      const userText = text || `Analyze lifestyle and diagnostic questions for ${activePatient.name}`;
+      const userText = rawText || `Analyze lifestyle and diagnostic questions for ${activePatient.name}`;
       promptInput.value = '';
 
       if (!CHAT_HISTORY[activePatient.id]) {
@@ -1576,7 +1966,7 @@
       }
     }
 
-    sendBtn.addEventListener('click', handleSendMessage);
+    sendBtn.addEventListener('click', () => handleSendMessage());
     promptInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
@@ -1590,7 +1980,11 @@
       btn.addEventListener('click', () => {
         const mode = btn.dataset.mode;
         if (mode === 'Details') {
-          openDetailsModal();
+          if (!activePatient) {
+            openSelectPatientModal('view-details');
+          } else {
+            openDetailsModal();
+          }
         } else {
           modeButtons.forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
@@ -1611,7 +2005,8 @@
         .replace(/"/g, '&quot;');
     }
 
-    // Initial render
+    // Initial render & dynamic greeting
+    updateGreeting();
     renderPatientList();
   </script>
 </body>
