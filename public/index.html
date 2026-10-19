@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roots — Cultural &amp; Lifestyle Clinical Intelligence</title>
+  <style>
+    @font-face {
+      font-family: 'The Silver Editorial';
+      src: url('/fonts/TheSilverEditorial-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'The Silver Editorial';
+      src: url('/fonts/TheSilverEditorial-Italic.ttf') format('truetype');
+      font-weight: 400;
+      font-style: italic;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Circular Std';
+      src: url('https://db.onlinewebfonts.com/t/860c3ec7bbc5da3e97233ccecafe512e.woff2') format('woff2'),
+           url('https://db.onlinewebfonts.com/t/860c3ec7bbc5da3e97233ccecafe512e.woff') format('woff');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Circular Std';
+      src: url('https://db.onlinewebfonts.com/t/9475d6a0b79c164f9f605673714e75d9.woff2') format('woff2'),
+           url('https://db.onlinewebfonts.com/t/9475d6a0b79c164f9f605673714e75d9.woff') format('woff');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      --bg-cream: #F7F4EC;
+      --surface-box: #EFECE3;
+      --border-subtle: rgba(31, 29, 25, 0.13);
+      --border-focus: rgba(31, 29, 25, 0.24);
+      --text-primary: #1F1E1B;
+      --text-secondary: #6E6B63;
+      --text-placeholder: #8A867D;
+      --accent-starburst: #D97757;
+      --accent-link: #4C7BD9;
+      --pill-bg: #E5E1D6;
+      --pill-active: #D6D1C4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-cream);
+      color: var(--text-primary);
+      font-family: 'Circular Std', 'Circular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      width: 100%;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      background-color: rgba(31, 30, 27, 0.05);
+      color: var(--text-primary);
+    }
+
+    .plan-pill-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .plan-pill {
+      background-color: rgba(31, 30, 27, 0.05);
+      border-radius: 9999px;
+      padding: 6px 15px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: -0.005em;
+    }
+
+    .plan-pill a {
+      color: var(--accent-link);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 400;
+    }
+
+    .main-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px 11vh 20px;
+    }
+
+    .hero-greeting {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin-bottom: 30px;
+    }
+
+    .serif-header {
+      font-family: 'The Silver Editorial', Georgia, serif;
+      font-size: 44px;
+      line-height: 1.1;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      font-weight: 400;
+    }
+
+    .composer-card {
+      width: 100%;
+      max-width: 640px;
+      background-color: var(--surface-box);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 16px 16px 12px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 112px;
+      box-shadow: 0 2px 12px rgba(31, 29, 25, 0.03);
+      transition: border-color 0.15s ease;
+    }
+
+    .composer-card:focus-within {
+      border-color: var(--border-focus);
+    }
+
+    .composer-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .composer-textarea::placeholder {
+      color: var(--text-placeholder);
+    }
+
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .controls-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .segmented-toggle {
+      display: inline-flex;
+      align-items: center;
+      background-color: var(--pill-bg);
+      border-radius: 8px;
+      padding: 2px;
+      gap: 2px;
+    }
+
+    .seg-btn {
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12.5px;
+      font-family: inherit;
+      font-weight: 400;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--pill-active);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .model-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12.5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .model-name {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .model-tier {
+      color: var(--text-secondary);
+    }
+
+    .mic-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 4px;
+    }
+
+    .wave-btn {
+      background-color: rgba(31, 30, 27, 0.06);
+      border: none;
+      color: var(--text-primary);
+      cursor: pointer;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.15s ease;
+    }
+
+    .wave-btn:hover {
+      background-color: rgba(31, 30, 27, 0.11);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Bar -->
+    <header class="top-bar">
+      <button type="button" class="icon-btn" aria-label="Toggle sidebar">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="3.5" width="15" height="13" rx="2.5" stroke="currentColor" stroke-width="1.4" />
+          <line x1="7.5" y1="3.5" x2="7.5" y2="16.5" stroke="currentColor" stroke-width="1.4" />
+        </svg>
+      </button>
+
+      <button type="button" class="icon-btn" aria-label="User profile">
+        <svg width="19" height="19" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 17.5V10C5 6.68629 7.68629 4 11 4C14.3137 4 17 6.68629 17 10V17.5C17 17.8 16.5 18 16 17.5C15.3 16.8 14.5 16.8 13.8 17.5C13.1 18.2 12.2 18.2 11.5 17.5C10.8 16.8 10.1 16.8 9.4 17.5C8.7 18.2 7.8 18.2 7.1 17.5C6.4 16.8 5.7 16.8 5 17.5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="9.2" cy="10.2" r="1" fill="currentColor" />
+          <circle cx="12.8" cy="10.2" r="1" fill="currentColor" />
+        </svg>
+      </button>
+    </header>
+
+    <!-- Top Center Pill -->
+    <div class="plan-pill-wrap">
+      <div class="plan-pill">
+        <span>Free plan</span>
+        <span style="opacity: 0.45;">·</span>
+        <a href="#upgrade" onclick="event.preventDefault()">Upgrade</a>
+      </div>
+    </div>
+
+    <!-- Centered Greeting & Composer -->
+    <main class="main-stage">
+      <div class="hero-greeting">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
+          <g stroke="#D97757" stroke-width="2.55" stroke-linecap="round">
+            <line x1="18" y1="3.5" x2="18" y2="32.5" />
+            <line x1="3.5" y1="18" x2="32.5" y2="18" />
+            <line x1="7.7" y1="7.7" x2="28.3" y2="28.3" />
+            <line x1="28.3" y1="7.7" x2="7.7" y2="28.3" />
+            <line x1="11.2" y1="4.8" x2="24.8" y2="31.2" />
+            <line x1="24.8" y1="4.8" x2="11.2" y2="31.2" />
+            <line x1="4.8" y1="11.2" x2="31.2" y2="24.8" />
+            <line x1="31.2" y1="11.2" x2="4.8" y2="24.8" />
+          </g>
+        </svg>
+        <h1 class="serif-header">Back at it, Noble</h1>
+      </div>
+
+      <div class="composer-card">
+        <textarea
+          id="promptInput"
+          class="composer-textarea"
+          rows="2"
+          placeholder="How can I help you today?"
+        ></textarea>
+
+        <div class="composer-footer">
+          <div class="controls-left">
+            <button type="button" class="icon-btn" aria-label="Add attachment" style="padding: 4px;">
+              <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+
+            <div class="segmented-toggle" id="modeToggle">
+              <button type="button" class="seg-btn active" data-mode="Chat">Chat</button>
+              <button type="button" class="seg-btn" data-mode="Cowork">Cowork</button>
+            </div>
+          </div>
+
+          <div class="controls-right">
+            <div class="model-badge">
+              <span class="model-name">Sonnet 5.5</span>
+              <span class="model-tier">Medium</span>
+            </div>
+
+            <button type="button" class="mic-btn" aria-label="Voice input">
+              <svg width="15" height="15" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="6.5" y="2.5" width="5" height="8.5" rx="2.5" stroke="currentColor" stroke-width="1.4" />
+                <path d="M4 9.5C4 12.2614 6.23858 14.5 9 14.5C11.7614 14.5 14 12.2614 14 9.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+                <line x1="9" y1="14.5" x2="9" y2="16.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" />
+              </svg>
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+
+            <button type="button" class="wave-btn" aria-label="Voice mode">
+              <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="3.5" y1="7" x2="3.5" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="6.2" y1="4.5" x2="6.2" y2="13.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="9" y1="3" x2="9" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="11.8" y1="5.5" x2="11.8" y2="12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+                <line x1="14.5" y1="7.5" x2="14.5" y2="10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('#modeToggle .seg-btn');
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>
