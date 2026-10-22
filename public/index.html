@@ -925,6 +925,126 @@
       font-size: 13px;
     }
 
+    /* Thinking State Animation */
+    .thinking-bubble {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 0;
+    }
+
+    .thinking-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #D4D4D8;
+      border-top-color: #18181B;
+      border-radius: 50%;
+      animation: spinLoader 0.7s linear infinite;
+    }
+
+    @keyframes spinLoader {
+      to { transform: rotate(360deg); }
+    }
+
+    .thinking-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: -0.01em;
+    }
+
+    /* Thought Process Accordion */
+    .thought-accordion {
+      margin-bottom: 14px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      background: #FAFAFA;
+      overflow: hidden;
+    }
+
+    .thought-accordion summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .thought-accordion summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .thought-accordion summary:hover {
+      background-color: #F4F4F5;
+      color: var(--text-primary);
+    }
+
+    .thought-accordion-chevron {
+      font-size: 10px;
+      transition: transform 0.2s ease;
+    }
+
+    .thought-accordion[open] .thought-accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    .thought-body {
+      padding: 10px 14px 12px 14px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      color: #52525B;
+      border-top: 1px solid var(--border-subtle);
+      background: #FFFFFF;
+      font-style: italic;
+    }
+
+    /* Standard of Living & Regional Context */
+    .section-mini-heading {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .standard-of-living-box {
+      background-color: #FAFAFA;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 10px 0 14px 0;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-primary);
+    }
+
+    .regional-illness-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 6px 0 14px 0;
+    }
+
+    .regional-illness-pill {
+      font-size: 11.5px;
+      background: var(--surface-box);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-weight: 500;
+    }
+
     .modal-avatar-img {
       width: 100%;
       height: 100%;
@@ -1432,45 +1552,8 @@
       }
     ];
 
-    // Local Chat Store by Patient ID
-    const CHAT_HISTORY = {
-      'PT-2041': [
-        {
-          role: 'user',
-          text: 'Chinedu came in with acute right lower abdomen pain. He plays football in Enugu and eats street food. How can I differentiate muscle strain vs appendicitis vs food poisoning using his lifestyle?'
-        },
-        {
-          role: 'assistant',
-          patientName: 'Chinedu Okafor',
-          location: 'New Haven, Enugu City',
-          places: ['Otigba Roundabout Turf', 'New Haven Pitch', 'Shoprite Enugu'],
-          brands: ['Nutri-Milk', 'Climax Energy Drink'],
-          tags: ['soccer', 'street food'],
-          lifestyle: [
-            'Regular 5-aside football on unpaved/turf pitches (intense sprinting, right-hip extension)',
-            'Daily commuter Keke rides over bumpy, potholed roads across New Haven & Independence Layout',
-            'Enugu food habits: Morning Okpa, late-afternoon roadside Abacha / Shawarma joints'
-          ],
-          questions: [
-            {
-              trigger: 'Football & Keke Bumps (Jarring Test)',
-              question: '"When you kick with your right leg during ball, or when the Keke hits a pothole on the road, does it send a sharp stabbing shock into your right lower abdomen?"',
-              clinicalWhy: 'Movement and hip extension stretch the psoas muscle against an inflamed appendix (Psoas sign). Football muscle strains only hurt when flexing the abdominal wall, not on passive vehicular road jarring.'
-            },
-            {
-              trigger: 'Okpa / Shawarma Appetite Test',
-              question: '"If someone brings you hot Okpa or Shawarma right now, do you want to eat it, or does the thought of food make you nauseated?"',
-              clinicalWhy: 'Complete loss of appetite (anorexia) for favorite local food is a hallmark of acute appendicitis in young patients.'
-            },
-            {
-              trigger: 'Roadside Abacha vs. Periumbilical Migration',
-              question: '"Did you eat street Abacha and have watery stool right away, or did the pain start dull around your bellybutton before slowly moving down to your right side?"',
-              clinicalWhy: 'Food poisoning presents with rapid diarrhea and diffuse cramps, whereas appendicitis typically migrates from the umbilicus to McBurney\'s point over 12–24 hours.'
-            }
-          ]
-        }
-      ]
-    };
+    // Local Chat Store by Patient ID (generated dynamically on the go)
+    const CHAT_HISTORY = {};
 
     let activePatient = null;
     let currentMode = 'Chat';
@@ -1813,18 +1896,48 @@
               <div class="message-row assistant">
                 <div class="assistant-bubble">
                   <div class="assistant-bubble-header">
-                    <span>Roots Clinical Agent · Qloo Taste AI (${msg.location || activePatient.location})</span>
+                    <span>Roots Clinical Intelligence · ${msg.patientName || activePatient.name} · ${msg.location || activePatient.location}</span>
                   </div>
+
+                  ${msg.thoughtProcess ? `
+                    <details class="thought-accordion">
+                      <summary>
+                        <span>✦ Thought process</span>
+                        <span class="thought-accordion-chevron">▼</span>
+                      </summary>
+                      <div class="thought-body">${escapeHtml(msg.thoughtProcess)}</div>
+                    </details>
+                  ` : ''}
+
+                  ${msg.standardOfLiving ? `
+                    <div class="standard-of-living-box">
+                      <div class="section-mini-heading">🏘️ Standard of Living &amp; Infrastructure · ${escapeHtml(msg.location || activePatient.location)}</div>
+                      <div>${escapeHtml(msg.standardOfLiving)}</div>
+                    </div>
+                  ` : ''}
+
+                  ${msg.regionalIllnesses && msg.regionalIllnesses.length > 0 ? `
+                    <div style="margin: 8px 0 12px 0;">
+                      <div class="section-mini-heading">🩺 Common Regional / Endemic Health Patterns</div>
+                      <div class="regional-illness-row">
+                        ${msg.regionalIllnesses.map(ill => `<span class="regional-illness-pill">⚠️ ${escapeHtml(ill)}</span>`).join('')}
+                      </div>
+                    </div>
+                  ` : ''}
+
                   ${msg.analysis ? `<div style="font-size:13.5px;color:var(--text-primary);line-height:1.55;margin-bottom:12px;">${escapeHtml(msg.analysis)}</div>` : ''}
+
                   <div>
-                    <strong style="color:var(--text-primary);">Peer Lifestyle &amp; Environmental Factors:</strong>
-                    <ul style="padding-left:18px;margin:6px 0 10px 0;color:var(--text-secondary);">
-                      ${(msg.lifestyle || activePatient.lifestyleSummary).map((l) => `<li style="margin-bottom:3px;">${l}</li>`).join('')}
+                    <strong style="color:var(--text-primary);font-size:13px;">Peer Lifestyle &amp; Environmental Factors:</strong>
+                    <ul style="padding-left:18px;margin:6px 0 10px 0;color:var(--text-secondary);font-size:13px;">
+                      ${(msg.lifestyle || activePatient.lifestyleSummary).map((l) => `<li style="margin-bottom:3px;">${escapeHtml(l)}</li>`).join('')}
                     </ul>
                   </div>
+
                   ${chips ? `<div class="qloo-chip-row">${chips}</div>` : ''}
+
                   <div style="margin-top:14px;">
-                    <strong style="color:var(--text-primary);">Diagnostic Questions for Dr. Aryta:</strong>
+                    <strong style="color:var(--text-primary);font-size:13px;">Targeted Anamnesis Probes for Dr. Aryta:</strong>
                     ${questionsHtml}
                   </div>
                 </div>
@@ -1921,10 +2034,10 @@
       typingEl.id = tempId;
       typingEl.innerHTML = `
         <div class="assistant-bubble">
-          <div class="assistant-bubble-header">
-            <span>Querying Qloo Taste AI Graph...</span>
+          <div class="thinking-bubble">
+            <div class="thinking-spinner"></div>
+            <span class="thinking-label">Thinking...</span>
           </div>
-          <p style="color:var(--text-secondary);">Connecting to <code>hackathon.api.qloo.com</code> for ${activePatient.name}'s peer demographic in ${activePatient.location}...</p>
         </div>
       `;
       thread.appendChild(typingEl);
@@ -1949,6 +2062,9 @@
           role: 'assistant',
           patientName: activePatient.name,
           location: activePatient.location,
+          thoughtProcess: data.thoughtProcess || null,
+          standardOfLiving: data.standardOfLiving || null,
+          regionalIllnesses: data.regionalIllnesses || [],
           analysis: data.analysis,
           places,
           brands,
