@@ -161,6 +161,90 @@
       border-color: #D4D4D8;
     }
 
+    .register-patient-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 9px 12px;
+      background-color: #09090B;
+      color: #FFFFFF;
+      border: 1px solid #09090B;
+      border-radius: 10px;
+      font-family: 'Circular Std', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: background-color 0.15s ease;
+    }
+
+    .register-patient-btn:hover {
+      background-color: #27272A;
+    }
+
+    /* Form Styles for Register Patient Modal */
+    .form-group {
+      margin-bottom: 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background-color: var(--surface-card);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: 'Circular Std', sans-serif;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: #52525B;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-submit-btn {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 10px;
+      background-color: #09090B;
+      color: #FFFFFF;
+      font-size: 13.5px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background-color 0.15s ease;
+    }
+
+    .form-submit-btn:hover {
+      background-color: #27272A;
+    }
+
+    .assistant-prose {
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: var(--text-primary);
+    }
+
     .search-box {
       position: relative;
       margin-bottom: 14px;
@@ -1225,6 +1309,14 @@
         <span>New Consultation</span>
       </button>
 
+      <!-- Register Patient Button -->
+      <button type="button" class="register-patient-btn" id="openRegisterPatientBtn">
+        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+          <path d="M9 3.5V14.5M3.5 9H14.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>+ Register New Patient</span>
+      </button>
+
       <!-- Search Bar -->
       <div class="search-box">
         <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
@@ -1403,6 +1495,58 @@
           <p class="select-modal-sub" id="selectModalSubtitle">Choose a patient from your clinic queue to begin or view lifestyle anamnesis.</p>
         </div>
         <div class="select-patient-grid" id="selectPatientGrid"></div>
+      </div>
+    </div>
+
+    <!-- Register Patient Modal Backdrop & Dialog -->
+    <div class="details-modal-backdrop" id="registerPatientModalBackdrop">
+      <div class="details-modal" style="max-width: 540px;" id="registerPatientModal">
+        <button type="button" class="modal-close-btn" id="closeRegisterPatientModalBtn" aria-label="Close registration">
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="select-modal-header">
+          <h2 class="select-modal-title">Register New Patient</h2>
+          <p class="select-modal-sub">Log patient hospital intake to analyze their neighborhood whereabouts, local food, and lifestyle realities via Qloo.</p>
+        </div>
+        <form id="registerPatientForm">
+          <div class="form-group">
+            <label class="form-label" for="regName">Full Name</label>
+            <input type="text" id="regName" class="form-input" placeholder="e.g. Aarav Sharma" required />
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="regAge">Age</label>
+              <input type="number" id="regAge" class="form-input" placeholder="e.g. 28" min="1" max="120" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="regSex">Sex</label>
+              <select id="regSex" class="form-select" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regLocation">Neighborhood, City &amp; Country</label>
+            <input type="text" id="regLocation" class="form-input" placeholder="e.g. Bandra West, Mumbai, India" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regOccupation">Occupation / Daily Routine</label>
+            <input type="text" id="regOccupation" class="form-input" placeholder="e.g. IT Consultant · 1.5hr evening suburban train commute" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regChiefComplaint">Chief Complaint / Hospital Triage</label>
+            <textarea id="regChiefComplaint" class="form-textarea" rows="2" placeholder="e.g. Acute chest burning and acid reflux after late commute meals" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="regVitals">Triage Vitals (optional)</label>
+            <input type="text" id="regVitals" class="form-input" placeholder="e.g. BP 128/82 mmHg · HR 84 bpm" />
+          </div>
+          <button type="submit" class="form-submit-btn">Register &amp; Begin Lifestyle Anamnesis</button>
+        </form>
       </div>
     </div>
   </div>
@@ -1896,7 +2040,7 @@
               <div class="message-row assistant">
                 <div class="assistant-bubble">
                   <div class="assistant-bubble-header">
-                    <span>Roots Clinical Intelligence · ${msg.patientName || activePatient.name} · ${msg.location || activePatient.location}</span>
+                    <span>Roots Lifestyle Intelligence · ${msg.patientName || activePatient.name} · ${msg.location || activePatient.location}</span>
                   </div>
 
                   ${msg.thoughtProcess ? `
@@ -1909,37 +2053,11 @@
                     </details>
                   ` : ''}
 
-                  ${msg.standardOfLiving ? `
-                    <div class="standard-of-living-box">
-                      <div class="section-mini-heading">🏘️ Standard of Living &amp; Infrastructure · ${escapeHtml(msg.location || activePatient.location)}</div>
-                      <div>${escapeHtml(msg.standardOfLiving)}</div>
-                    </div>
-                  ` : ''}
-
-                  ${msg.regionalIllnesses && msg.regionalIllnesses.length > 0 ? `
-                    <div style="margin: 8px 0 12px 0;">
-                      <div class="section-mini-heading">🩺 Common Regional / Endemic Health Patterns</div>
-                      <div class="regional-illness-row">
-                        ${msg.regionalIllnesses.map(ill => `<span class="regional-illness-pill">⚠️ ${escapeHtml(ill)}</span>`).join('')}
-                      </div>
-                    </div>
-                  ` : ''}
-
-                  ${msg.analysis ? `<div style="font-size:13.5px;color:var(--text-primary);line-height:1.55;margin-bottom:12px;">${escapeHtml(msg.analysis)}</div>` : ''}
-
-                  <div>
-                    <strong style="color:var(--text-primary);font-size:13px;">Peer Lifestyle &amp; Environmental Factors:</strong>
-                    <ul style="padding-left:18px;margin:6px 0 10px 0;color:var(--text-secondary);font-size:13px;">
-                      ${(msg.lifestyle || activePatient.lifestyleSummary).map((l) => `<li style="margin-bottom:3px;">${escapeHtml(l)}</li>`).join('')}
-                    </ul>
+                  <div class="assistant-prose">
+                    ${renderMarkdown(msg.text || msg.analysis || '')}
                   </div>
 
-                  ${chips ? `<div class="qloo-chip-row">${chips}</div>` : ''}
-
-                  <div style="margin-top:14px;">
-                    <strong style="color:var(--text-primary);font-size:13px;">Targeted Anamnesis Probes for Dr. Aryta:</strong>
-                    ${questionsHtml}
-                  </div>
+                  ${chips ? `<div class="qloo-chip-row" style="margin-top:14px;padding-top:10px;border-top:1px solid var(--border-subtle);">${chips}</div>` : ''}
                 </div>
               </div>
             `;
@@ -2063,14 +2181,10 @@
           patientName: activePatient.name,
           location: activePatient.location,
           thoughtProcess: data.thoughtProcess || null,
-          standardOfLiving: data.standardOfLiving || null,
-          regionalIllnesses: data.regionalIllnesses || [],
-          analysis: data.analysis,
+          text: data.text || data.analysis || '',
           places,
           brands,
           tags,
-          lifestyle: data.lifestyleFactors && data.lifestyleFactors.length > 0 ? data.lifestyleFactors : activePatient.lifestyleSummary,
-          questions: data.diagnosticQuestions && data.diagnosticQuestions.length > 0 ? data.diagnosticQuestions : activePatient.diagnosticQuestions
         };
 
         CHAT_HISTORY[activePatient.id].push(assistantResponse);
@@ -2127,6 +2241,142 @@
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
     }
+
+    function renderMarkdown(md) {
+      if (!md) return '';
+      let html = escapeHtml(md);
+
+      // Headers
+      html = html.replace(/^### (.*$)/gim, '<h4 style="font-size:13.5px;font-weight:700;color:var(--text-primary);margin:14px 0 6px 0;">$1</h4>');
+      html = html.replace(/^## (.*$)/gim, '<h3 style="font-size:14.5px;font-weight:700;color:var(--text-primary);margin:16px 0 8px 0;">$1</h3>');
+
+      // Bold & Italic
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+      // Unordered lists
+      html = html.replace(/^\s*[-*]\s+(.*$)/gim, '<li style="margin-bottom:4px;line-height:1.55;">$1</li>');
+      // Numbered lists
+      html = html.replace(/^\s*(\d+)\.\s+(.*$)/gim, '<li style="margin-bottom:4px;line-height:1.55;"><strong>$1.</strong> $2</li>');
+
+      // Group lists into ul
+      html = html.replace(/((?:<li[^>]*>.*?<\/li>\s*)+)/gis, '<ul style="padding-left:18px;margin:8px 0 12px 0;color:var(--text-primary);">$1</ul>');
+
+      // Paragraphs
+      const blocks = html.split(/\n{2,}/);
+      html = blocks
+        .map((b) => {
+          b = b.trim();
+          if (!b) return '';
+          if (b.startsWith('<h') || b.startsWith('<ul') || b.startsWith('<ol')) {
+            return b;
+          }
+          return `<p style="margin-bottom:10px;line-height:1.6;color:var(--text-primary);">${b.replace(/\n/g, '<br/>')}</p>`;
+        })
+        .join('');
+
+      return html;
+    }
+
+    // Register Patient Modal Handlers
+    const registerPatientModalBackdrop = document.getElementById('registerPatientModalBackdrop');
+    const openRegisterPatientBtn = document.getElementById('openRegisterPatientBtn');
+    const closeRegisterPatientModalBtn = document.getElementById('closeRegisterPatientModalBtn');
+    const registerPatientForm = document.getElementById('registerPatientForm');
+
+    function openRegisterModal() {
+      registerPatientModalBackdrop.classList.add('open');
+      document.getElementById('regName').focus();
+    }
+
+    function closeRegisterModal() {
+      registerPatientModalBackdrop.classList.remove('open');
+      registerPatientForm.reset();
+    }
+
+    if (openRegisterPatientBtn) {
+      openRegisterPatientBtn.addEventListener('click', () => {
+        toggleSidebar(false);
+        openRegisterModal();
+      });
+    }
+
+    if (closeRegisterPatientModalBtn) {
+      closeRegisterPatientModalBtn.addEventListener('click', closeRegisterModal);
+    }
+
+    registerPatientModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === registerPatientModalBackdrop) {
+        closeRegisterModal();
+      }
+    });
+
+    registerPatientForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const age = parseInt(document.getElementById('regAge').value, 10) || 30;
+      const sex = document.getElementById('regSex').value;
+      const location = document.getElementById('regLocation').value.trim();
+      const occupation = document.getElementById('regOccupation').value.trim();
+      const chiefComplaint = document.getElementById('regChiefComplaint').value.trim();
+      const vitals = document.getElementById('regVitals').value.trim() || 'BP 120/80 mmHg · HR 76 bpm';
+
+      // Parse initials
+      const initials = name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+
+      // Infer city for Qloo
+      let qlooLocation = 'Enugu';
+      const locLower = location.toLowerCase();
+      if (locLower.includes('mumbai') || locLower.includes('india')) qlooLocation = 'Mumbai';
+      else if (locLower.includes('lagos')) qlooLocation = 'Lagos';
+      else if (locLower.includes('london')) qlooLocation = 'London';
+      else if (locLower.includes('los angeles') || locLower.includes('california')) qlooLocation = 'Los Angeles';
+      else if (locLower.includes('new york') || locLower.includes('nyc')) qlooLocation = 'New York';
+      else if (locLower.includes('enugu')) qlooLocation = 'Enugu';
+      else {
+        const parts = location.split(',');
+        qlooLocation = parts[parts.length > 1 ? 1 : 0].trim();
+      }
+
+      let qlooAge = '25_to_34';
+      if (age < 25) qlooAge = '24_and_younger';
+      else if (age >= 35 && age < 55) qlooAge = '35_to_54';
+      else if (age >= 55) qlooAge = '55_and_older';
+
+      const newId = 'PT-' + Math.floor(1000 + Math.random() * 9000);
+
+      const newPatient = {
+        id: newId,
+        initials,
+        name,
+        avatarUrl: '',
+        age,
+        sex,
+        qlooAge,
+        qlooGender: sex.toLowerCase() === 'female' ? 'female' : 'male',
+        qlooLocation,
+        qlooTagQuery: 'food',
+        maritalStatus: 'Patient',
+        occupation: occupation || 'Local Resident',
+        location,
+        vitals,
+        chiefComplaint,
+        triageNote: `Registered at clinic: ${chiefComplaint}`,
+        lifestyleSummary: [
+          `Living and commuting around ${location}`,
+          `Occupation & daily schedule: ${occupation || 'Active routine'}`
+        ]
+      };
+
+      PATIENTS.unshift(newPatient);
+      closeRegisterModal();
+      selectPatientChat(newPatient);
+    });
 
     // Initial render & dynamic greeting
     updateGreeting();

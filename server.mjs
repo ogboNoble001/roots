@@ -92,58 +92,42 @@ async function queryGeminiClinicalReasoning(patient, message, qlooData) {
   const brandsList = (qlooData.brands || []).map((b) => b.name).join(', ');
   const tagsList = (qlooData.tags || []).map((t) => t.name).join(', ');
 
-  const systemInstruction = `You are Roots, an objective Clinical Lifestyle Intelligence organizer collaborating with attending physician Dr. Aryta.
-CRITICAL SAFETY & CLINICAL BOUNDARY:
-- You do NOT give medical advice or clinical diagnosis.
-- You must NEVER state, diagnose, or hint at what disease or medical condition is wrong with the patient.
-- Your sole job is to synthesize:
-  1. The local standard of living & environmental infrastructure in that city/neighborhood (water quality, transit jarring, pollution, food refrigeration/hygiene, economic stressors).
-  2. Common endemic regional illnesses and epidemiological patterns typical of that geography.
-  3. The peer lifestyle, recreational, and dietary attributes retrieved from the Qloo Taste Graph.
-- Organize all these factors into clear, objective anamnesis lifestyle factors and questions for Dr. Aryta to explore during patient examination.
+  const systemInstruction = `You are Roots, an intelligent Clinical Lifestyle & Environmental Intelligence assistant collaborating directly with attending physician Dr. Aryta.
+
+PURPOSE:
+Dr. Aryta is consulting on a patient and needs to understand what this person is actually going through in their neighborhood, city, and daily life. You synthesize the patient's local environment, whereabouts, food habits, and daily routine using real-world Qloo Taste Graph data so the doctor truly understands the patient's context.
+
+CRITICAL MEDICAL & SAFETY BOUNDARY:
+- Do NOT diagnose any medical disease or give medical prescriptions.
+- NEVER say "the patient has appendicitis" or "they have malaria".
+- Instead, focus on objective lifestyle correlation: what do people in this neighborhood eat, how do they commute, what physical and environmental stressors exist, and what questions should Dr. Aryta ask?
 
 PATIENT FILE:
 - Name: ${patient.name} (${patient.age}y, ${patient.sex})
 - Location: ${patient.location}
-- Occupation: ${patient.occupation}
-- Marital/Social: ${patient.maritalStatus}
+- Occupation: ${patient.occupation || 'Not specified'}
 - Chief Complaint: ${patient.chiefComplaint}
-- Triage Vitals: ${patient.vitals}
-- Baseline Lifestyle: ${(patient.lifestyleSummary || []).join('; ')}
+- Triage Vitals: ${patient.vitals || 'Not specified'}
+- Baseline Notes: ${(patient.lifestyleSummary || []).join('; ') || 'None'}
 
-LIVE QLOO DEMOGRAPHIC & CULTURAL TASTE SIGNALS:
-- Local Venues / Food Spots / Staples: ${placesList || 'Regional markets, local food vendors, and transit hubs'}
-- Peer Consumer Brands: ${brandsList || 'Regional food and beverage staples'}
-- Cultural & Recreational Tags: ${tagsList || 'Recreation, commuter transit, street food'}
+LIVE QLOO DEMOGRAPHIC TASTE GRAPH (What people of this age/demographic in ${patient.location} frequent):
+- Local Venues / Food Spots / Staples: ${placesList || 'Local food spots, markets, transit points'}
+- Peer Consumer Brands: ${brandsList || 'Regional staple brands and beverages'}
+- Recreational & Lifestyle Tags: ${tagsList || 'Street food, active commuter transit'}
 
 DOCTOR ARYTA'S MESSAGE:
 "${message}"
 
 INSTRUCTIONS:
-Generate the response in this exact JSON schema:
-{
-  "thoughtProcess": "A 2-3 sentence chain-of-thought analysis reflecting on: (a) the local standard of living and environmental infrastructure in ${patient.location}, (b) regional endemic illnesses in this area, and (c) how the Qloo lifestyle and food/transit habits intersect with Dr. Aryta's query.",
-  "standardOfLiving": "A concise summary of the standard of living, transit infrastructure, and environmental factors typical of ${patient.location} relevant to this cohort.",
-  "regionalIllnesses": [
-    "Common regional/endemic illness pattern 1 typical of ${patient.location} (e.g. food/water-borne, respiratory, environmental)",
-    "Common regional/endemic illness pattern 2 typical of ${patient.location}"
-  ],
-  "clinicalAnalysis": "A neutral, objective summary organizing the patient's lifestyle context (routines, transit, local foods) in relation to Dr. Aryta's query without claiming any diagnosis.",
-  "lifestyleFactors": [
-    "Specific lifestyle/environmental attribute 1 from Qloo/patient context",
-    "Specific lifestyle/environmental attribute 2 from Qloo/patient context"
-  ],
-  "diagnosticQuestions": [
-    {
-      "trigger": "Short lifestyle probe name (e.g. 'Daily Transit Jarring' or 'Local Food & Water Source')",
-      "question": "The exact objective lifestyle question Dr. Aryta can ask the patient about their routine",
-      "clinicalWhy": "The objective anamnesis purpose (e.g. 'Clarifies daily mechanical road impact vs. dietary exposure')"
-    }
-  ]
-}`;
+1. Begin with an optional <thought>...</thought> block containing your internal chain-of-thought analysis (evaluating the patient's neighborhood infrastructure, local dietary customs, and how this relates to Dr. Aryta's question).
+2. Follow with your response written in natural, fluent, conversational markdown (like Claude or ChatGPT):
+   - **Neighborhood & Whereabouts Reality**: Detail what daily life, physical transit, and living conditions are genuinely like for someone in ${patient.location}.
+   - **Local Food & Dietary Routine**: Connect the Qloo food spots and regional staples to what the patient is likely eating day-to-day.
+   - **Lifestyle Exposures & Bodily Impact**: Explain how these physical routines, foods, or environmental factors directly relate to the symptoms they are experiencing.
+   - **Targeted Anamnesis Questions**: Suggest 2-3 natural, respectful questions Dr. Aryta can ask the patient during examination to uncover these habits.`;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), 14000);
 
   try {
     const res = await fetch(
@@ -154,8 +138,7 @@ Generate the response in this exact JSON schema:
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: systemInstruction }] }],
           generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.3,
+            temperature: 0.4,
           },
         }),
         signal: controller.signal,
@@ -170,12 +153,12 @@ Generate the response in this exact JSON schema:
     const json = await res.json();
     const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (rawText) {
-      return JSON.parse(rawText);
+      return rawText;
     }
     throw new Error('Empty response from Gemini');
   } catch (err) {
     clearTimeout(timeout);
-    console.warn('Gemini query failed, using clinical fallback engine:', err.message);
+    console.warn('Gemini query failed:', err.message);
     return null;
   }
 }
@@ -308,49 +291,31 @@ const server = http.createServer(async (req, res) => {
         }));
 
         // 2. Query Gemini 2.5 Flash with Qloo Grounding
-        const geminiResult = await queryGeminiClinicalReasoning(patient, message, { places, brands, tags });
+        const rawOutput = await queryGeminiClinicalReasoning(patient, message, { places, brands, tags });
 
-        const thoughtProcess =
-          geminiResult?.thoughtProcess ||
-          `Evaluated standard of living and regional environmental factors for ${patient.location}. Cross-referenced Qloo consumer and venue signals (${places.slice(0, 3).map(p=>p.name).join(', ')}) with Dr. Aryta's query. Formulating objective, non-diagnostic anamnesis prompts.`;
+        let text = rawOutput || '';
+        let thoughtProcess = null;
 
-        const standardOfLiving =
-          geminiResult?.standardOfLiving ||
-          `Urban/peri-urban infrastructure in ${patient.location}. Variable road quality causing mechanical commuter vibration, dependence on municipal or localized boreholes/sachet water, and common ambient exposure to outdoor street vendors.`;
+        // Parse optional <thought>...</thought>
+        const thoughtMatch = text.match(/<thought>([\s\S]*?)<\/thought>/i);
+        if (thoughtMatch) {
+          thoughtProcess = thoughtMatch[1].trim();
+          text = text.replace(/<thought>[\s\S]*?<\/thought>/i, '').trim();
+        }
 
-        const regionalIllnesses =
-          geminiResult?.regionalIllnesses && geminiResult.regionalIllnesses.length > 0
-            ? geminiResult.regionalIllnesses
-            : ['Enteric food/water pathogens (Salmonella / Amebiasis)', 'Vector-borne tropical infections (Malaria)', 'Gastrointestinal gastritis from irregular dining'];
-
-        const analysis =
-          geminiResult?.clinicalAnalysis ||
-          `Dr. Aryta, ${patient.name}'s presentation requires cross-referencing acute symptoms against their regional lifestyle in ${patient.location}. The peer demographic signals highlight local mobility and recreational exertion as critical anamnesis targets.`;
-
-        const lifestyleFactors =
-          geminiResult?.lifestyleFactors && geminiResult.lifestyleFactors.length > 0
-            ? geminiResult.lifestyleFactors
-            : patient.lifestyleSummary || [
-                `Local peer activity patterns in ${patient.location}`,
-                `Regional dietary staples and commuter factors`,
-              ];
-
-        const diagnosticQuestions =
-          geminiResult?.diagnosticQuestions && geminiResult.diagnosticQuestions.length > 0
-            ? geminiResult.diagnosticQuestions
-            : patient.diagnosticQuestions || [];
+        if (!text) {
+          text = `Dr. Aryta, looking at **${patient.name}** (${patient.age}y) in **${patient.location}**, their daily whereabouts present key environmental and lifestyle factors directly impacting their health.\n\n` +
+            `Based on the local demographic data, their routine in this neighborhood involves daily movement around local transit hubs, high exposure to neighborhood eateries, and community staples. ` +
+            `When evaluating their chief complaint of *"${patient.chiefComplaint}"*, explore their specific daily meal timing, hydration sources, and physical commute vibrations.`;
+        }
 
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(
           JSON.stringify({
             success: true,
-            provider: geminiResult ? 'gemini-2.5-flash + qloo' : 'qloo-clinical-engine',
+            provider: rawOutput ? 'gemini-2.5-flash + qloo' : 'qloo-lifestyle-engine',
+            text,
             thoughtProcess,
-            standardOfLiving,
-            regionalIllnesses,
-            analysis,
-            lifestyleFactors,
-            diagnosticQuestions,
             places,
             brands,
             tags,
