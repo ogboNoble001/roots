@@ -2017,6 +2017,7 @@
           })
         });
         const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'No response from the AI');
         const el = document.getElementById(tempId);
         if (el) el.remove();
 
@@ -2216,6 +2217,7 @@
           })
         });
         const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'No response from the AI');
 
         const places = (data.places || []).slice(0, 4).map((p) => p.name);
         const brands = (data.brands || []).slice(0, 4).map((b) => b.name);
