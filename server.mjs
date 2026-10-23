@@ -95,6 +95,36 @@ async function queryGeminiClinicalReasoning(patient, message, qlooData) {
   return null;
 }
 
+// Extract dynamic search topics from user queries
+function extractDynamicQueryTopic(message, defaultTag = 'food') {
+  const m = (message || '').toLowerCase();
+  if (/hygiene|clean|sanitation|safety|wash|spoil|storage|bacteria|microb/i.test(m)) {
+    return 'hygiene';
+  }
+  if (/water|drink|beverage|hydration|sachet|borehole|tap|bottle|fluid/i.test(m)) {
+    return 'beverage';
+  }
+  if (/carb|sugar|fat|protein|nutrition|macronutrient|calorie|diet/i.test(m)) {
+    return 'nutrition';
+  }
+  if (/seasoning|spice|salt|sodium|maggi|knorr|pepper|oil/i.test(m)) {
+    return 'seasoning';
+  }
+  if (/medicine|drug|pharmacy|chemist|pill|painkiller|nsaid|diclofenac|paracetamol|supplement|herbal|bitters/i.test(m)) {
+    return 'pharmacy';
+  }
+  if (/market|grocery|supermarket|shop|store|buka|stall|vendor|buy|procure/i.test(m)) {
+    return 'market';
+  }
+  if (/commute|transit|road|traffic|drive|car|keke|bus|vibration|distance/i.test(m)) {
+    return 'transportation';
+  }
+  if (/exercise|sport|fitness|workout|walk|active|gym|football/i.test(m)) {
+    return 'fitness';
+  }
+  return defaultTag;
+}
+
 async function queryGeminiOnce(apiKey, patient, message, qlooData) {
   const placesList = (qlooData.places || []).map((p) => `${p.name} (affinity ${p.affinity}%)`).join(', ');
   const brandsList = (qlooData.brands || []).map((b) => b.name).join(', ');
@@ -117,13 +147,13 @@ CRITICAL ANALYTICAL BOUNDARIES:
 3. NO RELIGIOUS OR SOCIAL ASSUMPTIONS: Do not speculate about personal religious attendance, church fellowship, or spiritual activities. Stick strictly to physical, environmental, dietary, and consumer facts.
 4. ZERO MEDICAL LECTURING OR DIAGNOSIS: Never guess or diagnose pathologies, diseases, or physiological damage (do NOT use terms like "gastric erosion", "mucosal damage", "systemic vascular resistance", or "metabolic dysregulation"). Dr. Aryta is the physician and already understands clinical medicine. Your job is exclusively objective lifestyle, diet, transit, and consumer habits.
 
-GROUNDING SIGNALS FROM QLOO TASTE GRAPH:
+GROUNDING SIGNALS FROM QLOO TASTE GRAPH FOR THIS TOPIC:
 - Regional Venues & Hubs: ${placesList || 'Not specified'}
 - Consumer Brands: ${brandsList || 'Not specified'}
-- Cultural Tags: ${tagsList || 'Not specified'}
+- Cultural & Environmental Tags: ${tagsList || 'Not specified'}
 
 DEMOGRAPHIC & LOCAL CONTEXT:
-Cohort: ${cohort}, ${patient.location}. Environmental context: ${(patient.lifestyleSummary || []).join('; ') || 'Urban residential corridor'}.
+Cohort: ${cohort}, ${patient.location}.
 
 ${isBriefing
   ? `TASK: Generate a substantial, rich, and informative pre-consultation lifestyle briefing (~220-280 words).
@@ -132,7 +162,16 @@ Structure into three detailed sections:
 - **Dietary Spectrum & Culinary Staples**: Prevalent local dishes, cooking styles, exact ingredients, seasoning agents (e.g. palm oil, bouillon cubes), meal timings, and diverse sourcing across both neighborhood open-air markets and modern grocers.
 - **Physical Habits & Daily Realities**: Typical physical exertion vs sedentary routines, hydration sources, and common over-the-counter self-care preparations (e.g. pain relievers, teas, or herbal remedies) frequently used in this demographic.`
   : `TASK: Respond directly to Dr. Aryta's clinical follow-up: "${message}"
-Address the specific question directly using objective demographic and dietary facts (e.g. macronutrient composition, specific ingredients, portion profiles, or physical stress). Provide a substantive, detailed answer (~120-180 words) without medical lecturing or diagnosing.`}
+
+CRITICAL INSTRUCTION FOR FOLLOW-UP:
+- Answer ONLY Dr. Aryta's specific question: "${message}".
+- DO NOT circle back to or repeat generic baseline profile bullets (such as Maggi cubes, swallow meals, or herbal bitters) unless the question specifically asked about them!
+- For example, if Dr. Aryta asks about "hygiene practices", describe the ACTUAL hygiene and sanitation realities in ${patient.location} for this demographic cohort:
+  * Water supply and safety (treated municipal tap vs. filtration pitchers vs. borehole vs. sachet water).
+  * Food preparation and storage hygiene (refrigeration consistency during power outages or heat, raw meat temperature control at butcher/suya stands, cross-contamination, produce hot-water/salt washing).
+  * Environmental and market sanitation (open stalls, road dust exposure on displayed food, pest control).
+- Ground your answer strictly in ${patient.location} for this demographic (${cohort}).
+- Provide a substantive, detailed answer (~130-180 words) without medical lecturing or diagnosing.`}
 
 Output only the markdown text.`;
 
@@ -262,25 +301,34 @@ const server = http.createServer(async (req, res) => {
         const location = patient.qlooLocation || 'Enugu';
         const ageGroup = patient.qlooAge || '24_and_younger';
         const gender = patient.qlooGender || 'male';
-        const tagQuery = patient.qlooTagQuery || 'sport';
 
-        // 1. Fetch live Qloo entities for this patient
+        // Dynamically resolve tag topic from the query if this is a follow-up
+        const dynamicTopic = isInitial ? (patient.qlooTagQuery || 'food') : extractDynamicQueryTopic(message, patient.qlooTagQuery || 'food');
+
+        // Only return places chips if explicitly asked to list specific venues/locations, or for the initial briefing
+        const asksForPlaces = isInitial || /\b(where\s+do\s+they|which\s+(supermarkets?|grocer(y|ies)|markets?|restaurants?|cafes?|eater(y|ies)|spots?|stores?|shops?|venues?)|list\s+places|specific\s+spots|what\s+markets)\b/i.test(message);
+
+        // 1. Fetch live Qloo entities dynamically tailored to this patient & topic
         const [placesRes, brandsRes, tagsRes] = await Promise.all([
-          fetchQlooEndpoint('/v2/insights', {
-            'filter.type': 'urn:entity:place',
-            'filter.location.query': location,
-            'signal.demographics.age': ageGroup,
-            'signal.demographics.gender': gender,
-            'take': 6,
-          }),
-          fetchQlooEndpoint('/v2/insights', {
-            'filter.type': 'urn:entity:brand',
-            'signal.demographics.age': ageGroup,
-            'signal.demographics.gender': gender,
-            'take': 6,
-          }),
+          asksForPlaces
+            ? fetchQlooEndpoint('/v2/insights', {
+                'filter.type': 'urn:entity:place',
+                'filter.location.query': location,
+                'signal.demographics.age': ageGroup,
+                'signal.demographics.gender': gender,
+                'take': 6,
+              })
+            : Promise.resolve({ data: { results: { entities: [] } } }),
+          asksForPlaces || isInitial
+            ? fetchQlooEndpoint('/v2/insights', {
+                'filter.type': 'urn:entity:brand',
+                'signal.demographics.age': ageGroup,
+                'signal.demographics.gender': gender,
+                'take': 6,
+              })
+            : Promise.resolve({ data: { results: { entities: [] } } }),
           fetchQlooEndpoint('/v2/tags', {
-            'filter.query': tagQuery,
+            'filter.query': dynamicTopic,
             'feature.typo_tolerance': 'true',
             'take': 6,
           }),
