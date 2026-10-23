@@ -1963,6 +1963,13 @@
       startNewChat();
     });
 
+    // Pre-generated opening briefings (public/briefings.json) so patients open instantly
+    let PREBAKED = {};
+    const prebakedReady = fetch('/briefings.json')
+      .then((r) => (r.ok ? r.json() : {}))
+      .then((j) => { PREBAKED = j || {}; })
+      .catch(() => {});
+
     // Load an existing patient's consultation chat
     async function selectPatientChat(patient) {
       activePatient = patient;
@@ -1975,10 +1982,27 @@
       currentMode = 'Chat';
       modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
 
-      // If no history exists, automatically fetch the live Qloo lifestyle dossier right away!
       if (!CHAT_HISTORY[patient.id] || CHAT_HISTORY[patient.id].length === 0) {
         CHAT_HISTORY[patient.id] = [];
-        await fetchInitialBriefing(patient);
+        await prebakedReady;
+        const pre = PREBAKED[patient.id];
+        if (pre && pre.text) {
+          // Instant: use the saved briefing
+          CHAT_HISTORY[patient.id].push({
+            role: 'assistant',
+            patientName: patient.name,
+            location: patient.location,
+            thoughtProcess: pre.thoughtProcess || null,
+            text: pre.text,
+            places: pre.places || [],
+            brands: pre.brands || [],
+            tags: pre.tags || [],
+          });
+          renderChatThread();
+        } else {
+          // No saved briefing (e.g. newly registered patient): generate live
+          await fetchInitialBriefing(patient);
+        }
       } else {
         renderChatThread();
       }
@@ -2064,23 +2088,13 @@
               </div>
             `;
           } else {
+            // Deduplicate places and brands
+            const uniquePlaces = Array.from(new Set(msg.places || [])).slice(0, 4);
+            const uniqueBrands = Array.from(new Set(msg.brands || [])).slice(0, 3);
             const chips = [
-              ...(msg.places || []).map((p) => `<span class="qloo-chip">📍 ${p}</span>`),
-              ...(msg.brands || []).map((b) => `<span class="qloo-chip">🏷️ ${b}</span>`),
-              ...(msg.tags || []).map((t) => `<span class="qloo-chip"># ${t}</span>`)
+              ...uniquePlaces.map((p) => `<span class="qloo-chip">📍 ${escapeHtml(p)}</span>`),
+              ...uniqueBrands.map((b) => `<span class="qloo-chip">🏷️ ${escapeHtml(b)}</span>`),
             ].join('');
-
-            const questionsHtml = (msg.questions || [])
-              .map(
-                (q) => `
-                <div class="question-card">
-                  <div style="font-size:11px;color:var(--text-secondary);font-weight:700;margin-bottom:2px;">PROBE: ${q.trigger.toUpperCase()}</div>
-                  <div style="font-weight:500;margin-bottom:3px;color:var(--text-primary);">${q.question}</div>
-                  <div style="font-size:11.5px;color:var(--text-secondary);">${q.clinicalWhy}</div>
-                </div>
-              `
-              )
-              .join('');
 
             return `
               <div class="message-row assistant">

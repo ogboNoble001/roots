@@ -87,7 +87,15 @@ async function fetchQlooEndpoint(endpointPath, params = {}) {
 }
 
 async function queryGeminiClinicalReasoning(patient, message, qlooData) {
-  const apiKey = getNextGeminiKey();
+  const attempts = Math.max(1, Math.min(GEMINI_KEYS.length, 5));
+  for (let i = 0; i < attempts; i++) {
+    const out = await queryGeminiOnce(getNextGeminiKey(), patient, message, qlooData);
+    if (out) return out;
+  }
+  return null;
+}
+
+async function queryGeminiOnce(apiKey, patient, message, qlooData) {
   const placesList = (qlooData.places || []).map((p) => `${p.name} (affinity ${p.affinity}%)`).join(', ');
   const brandsList = (qlooData.brands || []).map((b) => b.name).join(', ');
   const tagsList = (qlooData.tags || []).map((t) => t.name).join(', ');
@@ -119,7 +127,7 @@ GROUNDING FROM THE QLOO TASTE GRAPH (real signals for this demographic and place
 - Lifestyle tags: ${tagsList || 'none returned'}
 
 WHO YOU'RE DESCRIBING:
-${cohort}, ${patient.location}. Background context (use it only to understand the cohort's setting, never state it as fact about one person): ${(patient.lifestyleSummary || []).join('; ') || 'none'}.
+${cohort}, ${patient.location}. Hints about their setting and foods (use these to describe what's COMMON in this setting; phrase them as general patterns, never as facts about one person, and never repeat exact personal specifics like precise times, commute lengths, job titles, or religious practice schedules): ${(patient.lifestyleSummary || []).join('; ') || 'none'}.
 
 ${isBriefing
   ? `THE TASK: Give the opening briefing.
