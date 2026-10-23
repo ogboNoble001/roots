@@ -1964,7 +1964,7 @@
     });
 
     // Load an existing patient's consultation chat
-    function selectPatientChat(patient) {
+    async function selectPatientChat(patient) {
       activePatient = patient;
       toggleSidebar(false);
       renderPatientList(patientSearchInput.value);
@@ -1974,40 +1974,85 @@
 
       currentMode = 'Chat';
       modeButtons.forEach((b) => b.classList.toggle('active', b.dataset.mode === 'Chat'));
-      renderChatThread();
+
+      // If no history exists, automatically fetch the live Qloo lifestyle dossier right away!
+      if (!CHAT_HISTORY[patient.id] || CHAT_HISTORY[patient.id].length === 0) {
+        CHAT_HISTORY[patient.id] = [];
+        await fetchInitialBriefing(patient);
+      } else {
+        renderChatThread();
+      }
+    }
+
+    async function fetchInitialBriefing(patient) {
+      mainStage.classList.remove('empty-state');
+      heroGreeting.classList.add('hidden');
+      chatThread.classList.add('visible');
+      chatThread.innerHTML = '';
+      composerContainer.classList.add('docked-bottom');
+      promptInput.placeholder = `Ask about ${patient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
+
+      const tempId = 'temp-' + Date.now();
+      const typingEl = document.createElement('div');
+      typingEl.className = 'message-row assistant';
+      typingEl.id = tempId;
+      typingEl.innerHTML = `
+        <div class="assistant-bubble">
+          <div class="thinking-bubble">
+            <div class="thinking-spinner"></div>
+            <span class="thinking-label">Synthesizing ${patient.name}'s lifestyle &amp; Qloo taste profile in ${patient.location}...</span>
+          </div>
+        </div>
+      `;
+      chatThread.appendChild(typingEl);
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+      try {
+        const res = await fetch('/api/roots/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patient: patient,
+            message: 'initial_briefing'
+          })
+        });
+        const data = await res.json();
+        const el = document.getElementById(tempId);
+        if (el) el.remove();
+
+        const places = (data.places || []).slice(0, 5).map((p) => p.name);
+        const brands = (data.brands || []).slice(0, 5).map((b) => b.name);
+        const tags = (data.tags || []).slice(0, 5).map((t) => t.name);
+
+        CHAT_HISTORY[patient.id].push({
+          role: 'assistant',
+          patientName: patient.name,
+          location: patient.location,
+          thoughtProcess: data.thoughtProcess || null,
+          text: data.text || '',
+          places,
+          brands,
+          tags,
+        });
+
+        renderChatThread();
+      } catch (err) {
+        const el = document.getElementById(tempId);
+        if (el) {
+          el.innerHTML = `<div class="assistant-bubble"><p style="color:#E57373;">Error retrieving Qloo lifestyle: ${escapeHtml(err.message)}</p></div>`;
+        }
+      }
     }
 
     function renderChatThread() {
       if (!activePatient) return;
       const history = CHAT_HISTORY[activePatient.id] || [];
 
-      if (history.length === 0) {
-        mainStage.classList.remove('empty-state');
-        heroGreeting.classList.add('hidden');
-        chatThread.classList.add('visible');
-        composerContainer.classList.add('docked-bottom');
-        promptInput.placeholder = `Ask about ${activePatient.name.split(' ')[0]}'s lifestyle or symptoms...`;
-
-        chatThread.innerHTML = `
-          <div class="message-row assistant">
-            <div class="assistant-bubble">
-              <div class="assistant-bubble-header">
-                <span>Roots Clinical Agent · Qloo Taste AI</span>
-              </div>
-              <p>Ready to analyze <strong>${activePatient.name}</strong> (${activePatient.age}y, ${activePatient.location}).</p>
-              <p style="color:var(--text-secondary);margin-top:6px;">Chief Complaint: <em>"${activePatient.chiefComplaint}"</em>. Ask any question or press send to pull their peer-group lifestyle profile and diagnostic probes.</p>
-            </div>
-          </div>
-        `;
-        return;
-      }
-
-      // Render existing conversation
       mainStage.classList.remove('empty-state');
       heroGreeting.classList.add('hidden');
       chatThread.classList.add('visible');
       composerContainer.classList.add('docked-bottom');
-      promptInput.placeholder = `Ask follow-up question about ${activePatient.name.split(' ')[0]}...`;
+      promptInput.placeholder = `Ask about ${activePatient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
 
       chatThread.innerHTML = history
         .map((msg) => {
