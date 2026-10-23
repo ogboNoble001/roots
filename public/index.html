@@ -317,34 +317,83 @@
       border-color: var(--border-subtle);
     }
 
-    .patient-avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      overflow: hidden;
-      position: relative;
-      background-color: var(--surface-avatar);
-      border: 1px solid var(--border-subtle);
-      flex-shrink: 0;
-    }
-
-    .patient-avatar-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .patient-avatar-fallback {
-      position: absolute;
-      inset: 0;
-      display: flex;
+    /* Bespoke Non-Slop Initials Avatar System */
+    .initials-avatar {
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      border-radius: 50%;
+      font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       font-weight: 700;
-      color: var(--text-primary);
-      background-color: var(--surface-avatar);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      user-select: none;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .initials-avatar.avatar-xs {
+      width: 24px;
+      height: 24px;
+      font-size: 9.5px;
+    }
+
+    .initials-avatar.avatar-sm {
+      width: 36px;
+      height: 36px;
+      font-size: 12px;
+    }
+
+    .initials-avatar.avatar-md {
+      width: 44px;
+      height: 44px;
+      font-size: 14.5px;
+    }
+
+    .initials-avatar.avatar-lg {
+      width: 72px;
+      height: 72px;
+      font-size: 24px;
+      letter-spacing: 0.06em;
+      box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.18), 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Curated Luxury Clinical Palettes */
+    .avatar-theme-emerald {
+      background: linear-gradient(135deg, #153828 0%, #0A1E15 100%);
+      color: #A7F3D0;
+      border: 1px solid rgba(52, 211, 153, 0.28);
+    }
+
+    .avatar-theme-amber {
+      background: linear-gradient(135deg, #2E1F16 0%, #160E0A 100%);
+      color: #FDE68A;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+    }
+
+    .avatar-theme-indigo {
+      background: linear-gradient(135deg, #1C223E 0%, #0D1020 100%);
+      color: #C7D2FE;
+      border: 1px solid rgba(129, 140, 248, 0.28);
+    }
+
+    .avatar-theme-rose {
+      background: linear-gradient(135deg, #371829 0%, #1A0A13 100%);
+      color: #FBCFE8;
+      border: 1px solid rgba(244, 114, 182, 0.28);
+    }
+
+    .avatar-theme-sapphire {
+      background: linear-gradient(135deg, #102A43 0%, #081524 100%);
+      color: #BAE6FD;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+    }
+
+    .avatar-theme-obsidian {
+      background: linear-gradient(135deg, #27272A 0%, #18181B 100%);
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.22);
     }
 
     .patient-info {
@@ -1376,13 +1425,7 @@
         <!-- Doctor Profile Badge on Top Right with Dropdown -->
         <div class="doc-profile-wrapper">
           <button type="button" class="doc-badge" id="docProfileBtn" title="Attending Physician: Dr. Aryta" aria-label="Physician Profile">
-            <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&auto=format&fit=crop&q=80"
-              alt="Dr. Aryta"
-              class="doc-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            />
-            <div class="doc-avatar-circle" style="display: none;">DA</div>
+            <div class="initials-avatar avatar-xs avatar-theme-obsidian">DA</div>
             <span style="font-weight: 500;">Dr. Aryta</span>
             <svg width="11" height="11" viewBox="0 0 16 16" fill="none" style="margin-left: 1px; color: var(--text-secondary);">
               <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1392,11 +1435,7 @@
           <!-- Dropdown Popover Menu -->
           <div class="doc-dropdown-menu" id="docDropdownMenu">
             <div class="dropdown-header">
-              <img
-                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=120&auto=format&fit=crop&q=80"
-                alt="Dr. Aryta"
-                class="dropdown-avatar-img"
-              />
+              <div class="initials-avatar avatar-sm avatar-theme-obsidian">DA</div>
               <div class="dropdown-header-info">
                 <div class="dropdown-name">Dr. Aryta</div>
                 <div class="dropdown-role">Attending Physician · Clinical AI</div>
@@ -1582,7 +1621,6 @@
         id: 'PT-2041',
         initials: 'CO',
         name: 'Chinedu Okafor',
-        avatarUrl: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&auto=format&fit=crop&q=80',
         age: 19,
         sex: 'Male',
         qlooAge: '24_and_younger',
@@ -1622,7 +1660,6 @@
         id: 'PT-2038',
         initials: 'TA',
         name: 'Tunde Adeyemi',
-        avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
         age: 46,
         sex: 'Male',
         qlooAge: '36_to_55',
@@ -1657,7 +1694,6 @@
         id: 'PT-2035',
         initials: 'ML',
         name: 'Maya Lin',
-        avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80',
         age: 23,
         sex: 'Female',
         qlooAge: '24_and_younger',
@@ -1692,7 +1728,6 @@
         id: 'PT-2029',
         initials: 'AN',
         name: 'Amara Nwosu',
-        avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80',
         age: 64,
         sex: 'Female',
         qlooAge: '55_and_older',
@@ -1850,6 +1885,27 @@
       }
     });
 
+    // Helper for Curated Non-Slop Luxury Initials Theme
+    function getAvatarTheme(patient) {
+      if (!patient) return 'avatar-theme-obsidian';
+      if (patient.id === 'PT-2041') return 'avatar-theme-emerald';  // Chinedu Okafor (Evergreen)
+      if (patient.id === 'PT-2038') return 'avatar-theme-amber';    // Tunde Adeyemi (Bronze Amber)
+      if (patient.id === 'PT-2035') return 'avatar-theme-indigo';   // Maya Lin (Midnight Indigo)
+      if (patient.id === 'PT-2029') return 'avatar-theme-rose';     // Amara Nwosu (Royal Plum Rose)
+      const themes = [
+        'avatar-theme-emerald',
+        'avatar-theme-amber',
+        'avatar-theme-indigo',
+        'avatar-theme-rose',
+        'avatar-theme-sapphire',
+        'avatar-theme-obsidian',
+      ];
+      let sum = 0;
+      const str = (patient.name || '') + (patient.id || '');
+      for (let i = 0; i < str.length; i++) sum += str.charCodeAt(i);
+      return themes[sum % themes.length];
+    }
+
     // Patient Selection Modal (shown when clicking Details or sending without an active consultation)
     function openSelectPatientModal(action = 'view-details', text = '') {
       pendingModalAction = action;
@@ -1863,14 +1919,14 @@
 
       selectPatientGrid.innerHTML = PATIENTS.map((p) => `
         <button type="button" class="select-patient-card" data-id="${p.id}">
-          <img src="${p.avatarUrl}" alt="${p.name}" class="card-avatar" onerror="this.src='';this.alt='${p.initials}';" />
+          <div class="initials-avatar avatar-md ${getAvatarTheme(p)}">${escapeHtml(p.initials)}</div>
           <div class="card-info">
             <div class="card-name-row">
-              <span class="card-name">${p.name}</span>
-              <span class="card-age">${p.age}y · ${p.sex}</span>
+              <span class="card-name">${escapeHtml(p.name)}</span>
+              <span class="card-age">${p.age}y · ${escapeHtml(p.sex)}</span>
             </div>
-            <div class="card-meta">${p.location}</div>
-            <div class="card-complaint">Complaint: ${p.chiefComplaint}</div>
+            <div class="card-meta">${escapeHtml(p.location)}</div>
+            <div class="card-complaint">Complaint: ${escapeHtml(p.chiefComplaint)}</div>
           </div>
           <span class="card-select-btn">Select</span>
         </button>
@@ -1907,20 +1963,14 @@
 
       detailsModalBody.innerHTML = `
         <div class="modal-profile-header">
-          <div class="modal-profile-avatar">
-            <img
-              src="${p.avatarUrl}"
-              alt="${p.name}"
-              class="modal-avatar-img"
-              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-            />
-            <div class="modal-avatar-fallback" style="display: none;">${p.initials}</div>
+          <div class="modal-profile-avatar" style="background:transparent;border:none;margin-bottom:14px;">
+            <div class="initials-avatar avatar-lg ${getAvatarTheme(p)}">${escapeHtml(p.initials)}</div>
           </div>
-          <div class="modal-patient-name">${p.name}</div>
+          <div class="modal-patient-name">${escapeHtml(p.name)}</div>
           <div class="modal-badge-row">
-            <span class="modal-tag">Patient #${p.id}</span>
-            <span class="modal-tag">${p.age} years old · ${p.sex}</span>
-            <span class="modal-tag">${p.maritalStatus}</span>
+            <span class="modal-tag">Patient #${escapeHtml(p.id)}</span>
+            <span class="modal-tag">${p.age} years old · ${escapeHtml(p.sex)}</span>
+            <span class="modal-tag">${escapeHtml(p.maritalStatus)}</span>
           </div>
         </div>
 
@@ -2333,22 +2383,14 @@
           const isActive = activePatient && p.id === activePatient.id;
           return `
             <button type="button" class="patient-item ${isActive ? 'active' : ''}" data-id="${p.id}">
-              <div class="patient-avatar">
-                <img
-                  src="${p.avatarUrl}"
-                  alt="${p.name}"
-                  class="patient-avatar-img"
-                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-                />
-                <div class="patient-avatar-fallback" style="display: none;">${p.initials}</div>
-              </div>
+              <div class="initials-avatar avatar-sm ${getAvatarTheme(p)}">${escapeHtml(p.initials)}</div>
               <div class="patient-info">
                 <div class="patient-name-row">
-                  <span class="patient-name">${p.name}</span>
-                  <span class="patient-age">${p.age}y · ${p.sex[0]}</span>
+                  <span class="patient-name">${escapeHtml(p.name)}</span>
+                  <span class="patient-age">${p.age}y · ${escapeHtml(p.sex[0])}</span>
                 </div>
-                <div class="patient-meta">${p.location}</div>
-                <div class="patient-meta" style="color: var(--text-secondary);">${p.chiefComplaint}</div>
+                <div class="patient-meta">${escapeHtml(p.location)}</div>
+                <div class="patient-meta" style="color: var(--text-secondary);">${escapeHtml(p.chiefComplaint)}</div>
               </div>
             </button>
           `;
