@@ -129,7 +129,18 @@ function extractDynamicQueryTopic(message, defaultTag = 'food') {
 }
 
 async function queryGeminiOnce(apiKey, patient, message, qlooData) {
-  const placesList = (qlooData.places || []).map((p) => `${p.name} (affinity ${p.affinity}%)`).join(', ');
+  // Build rich grounding summary from verified Qloo graph
+  const qlooVenues = (qlooData.places || []).map((p) => {
+    const dishesStr = (p.dishes && p.dishes.length > 0) ? ` [Qloo Discovered Dishes & Items: ${p.dishes.join(', ')}]` : '';
+    const addrStr = p.address ? ` [Address: ${p.address}]` : '';
+    return `• ${p.name} (${p.primaryGenre || 'Venue'})${addrStr}${dishesStr}`;
+  }).join('\n');
+
+  // Collect all verified dishes from Qloo
+  const allQlooDishes = Array.from(new Set(
+    (qlooData.places || []).flatMap((p) => p.dishes || [])
+  ));
+
   const brandsList = (qlooData.brands || []).map((b) => b.name).join(', ');
   const tagsList = (qlooData.tags || []).map((t) => t.name).join(', ');
 
@@ -144,6 +155,12 @@ PROFESSIONAL TONE & CLINICAL REGISTER:
 - Use precise, analytical terminology (e.g., "transit corridor", "dietary composition", "mechanical vibration", "culinary staples", "sodium density", "post-prandial load").
 - No emojis. No conversational openings or sign-offs. Start directly with the structured analysis.
 
+CRITICAL ARCHITECTURAL ROLE:
+You are an intelligent clinical intermediary between the Qloo Taste Graph and the physician Dr. Aryta.
+Your job is to take the verified Qloo Taste Graph data below (dishes, food categories, venues, addresses, brands, tags) and organize it into clinically actionable lifestyle intelligence.
+- 100% GROUNDED IN QLOO: When answering dietary or food questions, you MUST directly cite and analyze the verified Qloo dishes and culinary highlights provided below (such as ${allQlooDishes.slice(0, 6).join(', ') || 'verified regional items'}).
+- Do NOT generate generic textbook filler. Organize Qloo's data into clear, actionable clinical insight.
+
 CRITICAL ANALYTICAL BOUNDARIES:
 1. NO RIGID STEREOTYPES OR TIMETABLES: Do not pretend every individual in a neighborhood follows a single rigid daily schedule. Frame findings as common local patterns, dietary spectrums, and typical environmental realities across this demographic cohort (${cohort}) in ${patient.location}.
 2. DIVERSE SOCIOECONOMIC SPECTRUM: Reflect realistic local realities. For example, do not assume everyone shops at high-end supermarkets (like SPAR); acknowledge that many residents source fresh food and produce from local neighborhood open-air markets, roadside stalls, and corner patent medicine stores (chemists).
@@ -155,10 +172,21 @@ Never use vague, generic abstractions like "a network of public health centers",
 - In Southwest Houston: explicitly name real facilities (e.g. Memorial Hermann Southwest Hospital on Beechnut, St. Luke's Health Sugar Land, Harris Health clinics along Bellaire/Bissonnet, Alief Community Health Center). Name real markets and corridors (Wazobia African Market, Southwest Farmers Market, Bissonnet St, I-69).
 - In Koreatown / Los Angeles: explicitly name real facilities (e.g. CHA Hollywood Presbyterian Medical Center, KHEIR Community Clinic on 6th St, Good Samaritan Hospital / PIH Health, Cedars-Sinai Medical Center). Name real markets (H Mart Koreatown, Galleria Market on Olympic Blvd, Wilshire corridor).
 
-GROUNDING SIGNALS FROM QLOO TASTE GRAPH FOR THIS TOPIC:
-- Regional Venues & Hubs: ${placesList || 'Not specified'}
-- Consumer Brands: ${brandsList || 'Not specified'}
-- Cultural & Environmental Tags: ${tagsList || 'Not specified'}
+===================================================================
+VERIFIED QLOO TASTE AI GRAPH SIGNALS (MANDATORY SOURCE OF TRUTH):
+===================================================================
+Local Qloo Venues & Addresses for ${patient.location}:
+${qlooVenues || 'None queried'}
+
+Verified Qloo Specific Dishes & Sourcing Highlights:
+${allQlooDishes.length > 0 ? allQlooDishes.join(', ') : 'None queried'}
+
+Qloo Cultural & Environmental Tags:
+${tagsList || 'Not specified'}
+
+Qloo Consumer Brands:
+${brandsList || 'Not specified'}
+===================================================================
 
 DEMOGRAPHIC & LOCAL CONTEXT:
 Cohort: ${cohort}, ${patient.location}.
@@ -167,14 +195,15 @@ ${isBriefing
   ? `TASK: Generate a substantial, rich, and informative pre-consultation lifestyle briefing (~220-280 words).
 Structure into three detailed sections:
 - **Neighborhood Environment & Transit Realities**: Local street infrastructure, road conditions (tarred vs unpaved), vehicular vs pedestrian mobility, commute strain, and ambient dust/exhaust exposure.
-- **Dietary Spectrum & Culinary Staples**: Prevalent local dishes, cooking styles, exact ingredients, seasoning agents (e.g. palm oil, bouillon cubes), meal timings, and diverse sourcing across both neighborhood open-air markets and modern grocers.
+- **Dietary Spectrum & Culinary Staples**: Prevalent local dishes, cooking styles, exact ingredients, seasoning agents (e.g. palm oil, bouillon cubes), meal timings, and diverse sourcing across both neighborhood open-air markets and modern grocers. Cite the verified Qloo dishes.
 - **Physical Habits & Daily Realities**: Typical physical exertion vs sedentary routines, hydration sources, and common over-the-counter self-care preparations (e.g. pain relievers, teas, or herbal remedies) frequently used in this demographic.`
   : `TASK: Respond directly to Dr. Aryta's clinical follow-up: "${message}"
 
 CRITICAL INSTRUCTION FOR FOLLOW-UP:
 - Answer ONLY Dr. Aryta's specific question: "${message}".
-- DO NOT circle back to or repeat generic baseline profile bullets (such as Maggi cubes, swallow meals, or herbal bitters) unless the question specifically asked about them!
-- ALWAYS NAME THE EXACT REAL-WORLD INSTITUTIONS, HOSPITALS, MARKETS, AND STREETS by their proper nouns. Never use generic filler like "a network of clinics" or "health centers".
+- DO NOT circle back to or repeat generic baseline profile bullets unless asked.
+- When answering about food or diet, DIRECTLY analyze and cite the verified Qloo dishes (${allQlooDishes.slice(0, 8).join(', ') || 'regional dishes'}).
+- ALWAYS NAME THE EXACT REAL-WORLD INSTITUTIONS, HOSPITALS, MARKETS, AND STREETS by their proper nouns.
 - Provide a substantive, detailed, and practically grounded answer (~130-180 words) without medical lecturing or diagnosing.`}
 
 Output only the markdown text.`;
@@ -309,40 +338,49 @@ const server = http.createServer(async (req, res) => {
         // Dynamically resolve tag topic from the query if this is a follow-up
         const dynamicTopic = isInitial ? (patient.qlooTagQuery || 'food') : extractDynamicQueryTopic(message, patient.qlooTagQuery || 'food');
 
-        // Only return places chips if explicitly asked to list specific venues/locations, or for the initial briefing
+        // Only show place chips in the UI if explicitly asked to list specific venues/locations, or for the initial briefing
         const asksForPlaces = isInitial || /\b(where\s+do\s+they|which\s+(supermarkets?|grocer(y|ies)|markets?|restaurants?|cafes?|eater(y|ies)|spots?|stores?|shops?|venues?)|list\s+places|specific\s+spots|what\s+markets)\b/i.test(message);
 
-        // 1. Fetch live Qloo entities dynamically tailored to this patient & topic
+        // 1. ALWAYS fetch live Qloo entities for deep grounding (dishes, menu highlights, sourcing categories)
         const [placesRes, brandsRes, tagsRes] = await Promise.all([
-          asksForPlaces
-            ? fetchQlooEndpoint('/v2/insights', {
-                'filter.type': 'urn:entity:place',
-                'filter.location.query': location,
-                'signal.demographics.age': ageGroup,
-                'signal.demographics.gender': gender,
-                'take': 6,
-              })
-            : Promise.resolve({ data: { results: { entities: [] } } }),
-          asksForPlaces || isInitial
-            ? fetchQlooEndpoint('/v2/insights', {
-                'filter.type': 'urn:entity:brand',
-                'signal.demographics.age': ageGroup,
-                'signal.demographics.gender': gender,
-                'take': 6,
-              })
-            : Promise.resolve({ data: { results: { entities: [] } } }),
+          fetchQlooEndpoint('/v2/insights', {
+            'filter.type': 'urn:entity:place',
+            'filter.location.query': location,
+            'signal.demographics.age': ageGroup,
+            'signal.demographics.gender': gender,
+            'take': 6,
+          }),
+          fetchQlooEndpoint('/v2/insights', {
+            'filter.type': 'urn:entity:brand',
+            'signal.demographics.age': ageGroup,
+            'signal.demographics.gender': gender,
+            'take': 6,
+          }),
           fetchQlooEndpoint('/v2/tags', {
             'filter.query': dynamicTopic,
             'feature.typo_tolerance': 'true',
-            'take': 6,
+            'take': 8,
           }),
         ]);
 
-        const places = (placesRes?.data?.results?.entities || []).map((e) => ({
-          name: e.name,
-          id: e.entity_id,
-          affinity: e.query?.affinity ? Math.round(e.query.affinity * 100) : null,
-        }));
+        const fullQlooPlaces = (placesRes?.data?.results?.entities || []).map((e) => {
+          const rawHighlights = [
+            ...(e.properties?.keywords || []).map((k) => k.name),
+            ...(e.tags || []).map((t) => t.name),
+          ];
+          const foodDishes = rawHighlights.filter((h) =>
+            /soup|ukwa|rice|chicken|beef|meat|dish|stew|vegetable|produce|bakery|butcher|grocer|market|pie|shawarma|salad|yam|swallow/i.test(h)
+          );
+          return {
+            name: e.name,
+            id: e.entity_id,
+            affinity: e.query?.affinity ? Math.round(e.query.affinity * 100) : null,
+            address: e.disambiguation || e.properties?.address || '',
+            primaryGenre: e.properties?.primary_genre?.name || 'Local Venue',
+            dishes: Array.from(new Set(foodDishes)),
+            allTags: (e.tags || []).map((t) => t.name).slice(0, 15),
+          };
+        });
 
         const brands = (brandsRes?.data?.results?.entities || []).map((e) => ({
           name: e.name,
@@ -355,8 +393,8 @@ const server = http.createServer(async (req, res) => {
           id: t.tag_id || t.id,
         }));
 
-        // 2. Query Gemini 2.5 Flash with Qloo Grounding
-        const rawOutput = await queryGeminiClinicalReasoning(patient, message, { places, brands, tags });
+        // 2. Query Gemini 2.5 Flash with Deep Qloo Grounding (Dishes, Venues, Tags)
+        const rawOutput = await queryGeminiClinicalReasoning(patient, message, { places: fullQlooPlaces, brands, tags });
 
         let text = rawOutput || '';
         let thoughtProcess = null;
@@ -374,6 +412,10 @@ const server = http.createServer(async (req, res) => {
           return;
         }
 
+        // Frontend places chips: only show when relevant (initial briefing or user asked for places)
+        const frontendPlaces = asksForPlaces ? fullQlooPlaces.map(p => ({ name: p.name, id: p.id, affinity: p.affinity })) : [];
+        const frontendBrands = asksForPlaces ? brands : [];
+
         res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
         res.end(
           JSON.stringify({
@@ -381,8 +423,8 @@ const server = http.createServer(async (req, res) => {
             provider: rawOutput ? 'gemini-2.5-flash + qloo' : 'qloo-lifestyle-engine',
             text,
             thoughtProcess,
-            places,
-            brands,
+            places: frontendPlaces,
+            brands: frontendBrands,
             tags,
           })
         );
