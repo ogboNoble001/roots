@@ -1009,32 +1009,56 @@
       font-size: 13px;
     }
 
-    /* Thinking State Animation */
+    /* Thinking State Animation with Shimmering Gradient Text */
     .thinking-bubble {
       display: inline-flex;
       align-items: center;
-      gap: 10px;
-      padding: 6px 0;
+      padding: 4px 0;
     }
 
-    .thinking-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid #D4D4D8;
-      border-top-color: #18181B;
-      border-radius: 50%;
-      animation: spinLoader 0.7s linear infinite;
-    }
-
-    @keyframes spinLoader {
-      to { transform: rotate(360deg); }
-    }
-
-    .thinking-label {
-      font-size: 13px;
+    .thinking-gradient-text {
+      font-size: 14px;
       font-weight: 500;
-      color: var(--text-secondary);
       letter-spacing: -0.01em;
+      background: linear-gradient(
+        90deg,
+        #71717A 0%,
+        #D4D4D8 25%,
+        #18181B 50%,
+        #D4D4D8 75%,
+        #71717A 100%
+      );
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmerText 2.2s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes shimmerText {
+      0% {
+        background-position: 200% center;
+      }
+      100% {
+        background-position: -200% center;
+      }
+    }
+
+    /* LLM Streaming Cursor */
+    .streaming-cursor {
+      display: inline-block;
+      width: 6.5px;
+      height: 14px;
+      margin-left: 3px;
+      background-color: var(--text-primary);
+      vertical-align: -2px;
+      border-radius: 1px;
+      animation: blinkCursor 0.75s ease-in-out infinite;
+    }
+
+    @keyframes blinkCursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     /* Thought Process Accordion */
@@ -1970,8 +1994,82 @@
       .then((j) => { PREBAKED = j || {}; })
       .catch(() => {});
 
+    // Active LLM Streaming Controller
+    let activeStreamController = null;
+
+    function streamMarkdownText(targetEl, fullText) {
+      return new Promise((resolve) => {
+        if (activeStreamController) {
+          activeStreamController.abort = true;
+        }
+        const currentCtrl = { abort: false };
+        activeStreamController = currentCtrl;
+
+        // Tokenize into natural words, whitespace, punctuation, newlines
+        const tokens = fullText.match(/(\r\n|\n+|\s+|[^\s\w]+|\w+)/g) || [fullText];
+        let index = 0;
+        let accumulated = '';
+
+        function getDelay(token) {
+          if (token.includes('\n')) return 110 + Math.random() * 40;
+          if (/[.?!]/.test(token)) return 85 + Math.random() * 35;
+          if (/[,;:]/.test(token)) return 45 + Math.random() * 25;
+          return 14 + Math.random() * 14;
+        }
+
+        function renderFrame() {
+          let html = renderMarkdown(accumulated);
+          if (html.endsWith('</p>')) {
+            html = html.replace(/(<\/p>)$/, '<span class="streaming-cursor"></span>$1');
+          } else if (html.endsWith('</li>')) {
+            html = html.replace(/(<\/li>)$/, '<span class="streaming-cursor"></span>$1');
+          } else {
+            html += '<span class="streaming-cursor"></span>';
+          }
+          targetEl.innerHTML = html;
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+        }
+
+        function step() {
+          if (currentCtrl.abort) {
+            resolve();
+            return;
+          }
+
+          if (index >= tokens.length) {
+            targetEl.innerHTML = renderMarkdown(fullText);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            if (activeStreamController === currentCtrl) {
+              activeStreamController = null;
+            }
+            resolve();
+            return;
+          }
+
+          // Occasional multi-token burst simulation (like LLM packet bursts)
+          const burstCount = (tokens[index] && tokens[index].length <= 2 && Math.random() > 0.6) ? 2 : 1;
+          for (let b = 0; b < burstCount && index < tokens.length; b++) {
+            accumulated += tokens[index];
+            index++;
+          }
+
+          renderFrame();
+
+          const lastToken = tokens[index - 1] || '';
+          const delay = getDelay(lastToken);
+          setTimeout(step, delay);
+        }
+
+        step();
+      });
+    }
+
     // Load an existing patient's consultation chat
     async function selectPatientChat(patient) {
+      if (activeStreamController) {
+        activeStreamController.abort = true;
+      }
+
       activePatient = patient;
       toggleSidebar(false);
       renderPatientList(patientSearchInput.value);
@@ -1984,10 +2082,65 @@
 
       if (!CHAT_HISTORY[patient.id] || CHAT_HISTORY[patient.id].length === 0) {
         CHAT_HISTORY[patient.id] = [];
+
+        mainStage.classList.remove('empty-state');
+        heroGreeting.classList.add('hidden');
+        chatThread.classList.add('visible');
+        composerContainer.classList.add('docked-bottom');
+        promptInput.placeholder = `Ask about ${patient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
+        chatThread.innerHTML = '';
+
+        const tempId = 'briefing-' + patient.id;
+        const assistantRow = document.createElement('div');
+        assistantRow.className = 'message-row assistant';
+        assistantRow.id = tempId;
+        assistantRow.innerHTML = `
+          <div class="assistant-bubble">
+            <div class="thinking-bubble">
+              <span class="thinking-gradient-text">Thinking...</span>
+            </div>
+          </div>
+        `;
+        chatThread.appendChild(assistantRow);
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
         await prebakedReady;
         const pre = PREBAKED[patient.id];
+
         if (pre && pre.text) {
-          // Instant: use the saved briefing
+          // Realistic initial thinking window before streaming response
+          await new Promise((r) => setTimeout(r, 650));
+          if (!activePatient || activePatient.id !== patient.id) return;
+
+          const bubble = assistantRow.querySelector('.assistant-bubble');
+          if (!bubble) return;
+
+          bubble.innerHTML = `
+            <div class="assistant-bubble-header">
+              <span>Roots Lifestyle Intelligence · ${escapeHtml(patient.name)} · ${escapeHtml(patient.location)}</span>
+            </div>
+            <div class="assistant-prose"></div>
+          `;
+
+          const proseEl = bubble.querySelector('.assistant-prose');
+          await streamMarkdownText(proseEl, pre.text);
+          if (!activePatient || activePatient.id !== patient.id) return;
+
+          const uniquePlaces = Array.from(new Set(pre.places || [])).slice(0, 4);
+          const uniqueBrands = Array.from(new Set(pre.brands || [])).slice(0, 3);
+          const chips = [
+            ...uniquePlaces.map((p) => `<span class="qloo-chip">📍 ${escapeHtml(p)}</span>`),
+            ...uniqueBrands.map((b) => `<span class="qloo-chip">🏷️ ${escapeHtml(b)}</span>`),
+          ].join('');
+
+          if (chips) {
+            const chipRow = document.createElement('div');
+            chipRow.className = 'qloo-chip-row';
+            chipRow.style.cssText = 'margin-top:14px;padding-top:10px;border-top:1px solid var(--border-subtle);';
+            chipRow.innerHTML = chips;
+            bubble.appendChild(chipRow);
+          }
+
           CHAT_HISTORY[patient.id].push({
             role: 'assistant',
             patientName: patient.name,
@@ -1998,37 +2151,38 @@
             brands: pre.brands || [],
             tags: pre.tags || [],
           });
-          renderChatThread();
         } else {
           // No saved briefing (e.g. newly registered patient): generate live
-          await fetchInitialBriefing(patient);
+          await fetchInitialBriefing(patient, assistantRow);
         }
       } else {
         renderChatThread();
       }
     }
 
-    async function fetchInitialBriefing(patient) {
+    async function fetchInitialBriefing(patient, existingRow) {
       mainStage.classList.remove('empty-state');
       heroGreeting.classList.add('hidden');
       chatThread.classList.add('visible');
-      chatThread.innerHTML = '';
       composerContainer.classList.add('docked-bottom');
       promptInput.placeholder = `Ask about ${patient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
 
-      const tempId = 'temp-' + Date.now();
-      const typingEl = document.createElement('div');
-      typingEl.className = 'message-row assistant';
-      typingEl.id = tempId;
-      typingEl.innerHTML = `
-        <div class="assistant-bubble">
-          <div class="thinking-bubble">
-            <div class="thinking-spinner"></div>
-            <span class="thinking-label">Synthesizing ${patient.name}'s lifestyle &amp; Qloo taste profile in ${patient.location}...</span>
+      let assistantRow = existingRow;
+      if (!assistantRow) {
+        chatThread.innerHTML = '';
+        const tempId = 'temp-' + Date.now();
+        assistantRow = document.createElement('div');
+        assistantRow.className = 'message-row assistant';
+        assistantRow.id = tempId;
+        assistantRow.innerHTML = `
+          <div class="assistant-bubble">
+            <div class="thinking-bubble">
+              <span class="thinking-gradient-text">Thinking...</span>
+            </div>
           </div>
-        </div>
-      `;
-      chatThread.appendChild(typingEl);
+        `;
+        chatThread.appendChild(assistantRow);
+      }
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 
       try {
@@ -2042,29 +2196,65 @@
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'No response from the AI');
-        const el = document.getElementById(tempId);
-        if (el) el.remove();
+        if (!activePatient || activePatient.id !== patient.id) return;
+
+        const bubble = assistantRow.querySelector('.assistant-bubble');
+        if (!bubble) return;
+
+        bubble.innerHTML = `
+          <div class="assistant-bubble-header">
+            <span>Roots Lifestyle Intelligence · ${escapeHtml(patient.name)} · ${escapeHtml(patient.location)}</span>
+          </div>
+          ${data.thoughtProcess ? `
+            <details class="thought-accordion">
+              <summary>
+                <span>✦ Thought process</span>
+                <span class="thought-accordion-chevron">▼</span>
+              </summary>
+              <div class="thought-body">${escapeHtml(data.thoughtProcess)}</div>
+            </details>
+          ` : ''}
+          <div class="assistant-prose"></div>
+        `;
+
+        const proseEl = bubble.querySelector('.assistant-prose');
+        const textToStream = data.text || '';
+        await streamMarkdownText(proseEl, textToStream);
+        if (!activePatient || activePatient.id !== patient.id) return;
 
         const places = (data.places || []).slice(0, 5).map((p) => p.name);
         const brands = (data.brands || []).slice(0, 5).map((b) => b.name);
         const tags = (data.tags || []).slice(0, 5).map((t) => t.name);
+
+        const uniquePlaces = Array.from(new Set(places)).slice(0, 4);
+        const uniqueBrands = Array.from(new Set(brands)).slice(0, 3);
+        const chips = [
+          ...uniquePlaces.map((p) => `<span class="qloo-chip">📍 ${escapeHtml(p)}</span>`),
+          ...uniqueBrands.map((b) => `<span class="qloo-chip">🏷️ ${escapeHtml(b)}</span>`),
+        ].join('');
+
+        if (chips) {
+          const chipRow = document.createElement('div');
+          chipRow.className = 'qloo-chip-row';
+          chipRow.style.cssText = 'margin-top:14px;padding-top:10px;border-top:1px solid var(--border-subtle);';
+          chipRow.innerHTML = chips;
+          bubble.appendChild(chipRow);
+        }
 
         CHAT_HISTORY[patient.id].push({
           role: 'assistant',
           patientName: patient.name,
           location: patient.location,
           thoughtProcess: data.thoughtProcess || null,
-          text: data.text || '',
+          text: textToStream,
           places,
           brands,
           tags,
         });
-
-        renderChatThread();
       } catch (err) {
-        const el = document.getElementById(tempId);
-        if (el) {
-          el.innerHTML = `<div class="assistant-bubble"><p style="color:#E57373;">Error retrieving Qloo lifestyle: ${escapeHtml(err.message)}</p></div>`;
+        const bubble = assistantRow.querySelector('.assistant-bubble');
+        if (bubble) {
+          bubble.innerHTML = `<p style="color:#E57373;font-size:13px;line-height:1.5;">Error retrieving Qloo lifestyle: ${escapeHtml(err.message)}</p>`;
         }
       }
     }
@@ -2191,6 +2381,8 @@
 
       const userText = rawText || `Analyze lifestyle and diagnostic questions for ${activePatient.name}`;
       promptInput.value = '';
+      sendBtn.disabled = true;
+      promptInput.disabled = true;
 
       if (!CHAT_HISTORY[activePatient.id]) {
         CHAT_HISTORY[activePatient.id] = [];
@@ -2213,8 +2405,7 @@
       typingEl.innerHTML = `
         <div class="assistant-bubble">
           <div class="thinking-bubble">
-            <div class="thinking-spinner"></div>
-            <span class="thinking-label">Thinking...</span>
+            <span class="thinking-gradient-text">Thinking...</span>
           </div>
         </div>
       `;
@@ -2232,35 +2423,72 @@
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'No response from the AI');
+        if (!activePatient) return;
+
+        const bubble = typingEl.querySelector('.assistant-bubble');
+        if (!bubble) return;
+
+        bubble.innerHTML = `
+          <div class="assistant-bubble-header">
+            <span>Roots Lifestyle Intelligence · ${escapeHtml(activePatient.name)} · ${escapeHtml(activePatient.location)}</span>
+          </div>
+          ${data.thoughtProcess ? `
+            <details class="thought-accordion">
+              <summary>
+                <span>✦ Thought process</span>
+                <span class="thought-accordion-chevron">▼</span>
+              </summary>
+              <div class="thought-body">${escapeHtml(data.thoughtProcess)}</div>
+            </details>
+          ` : ''}
+          <div class="assistant-prose"></div>
+        `;
+
+        const proseEl = bubble.querySelector('.assistant-prose');
+        const responseText = data.text || data.analysis || '';
+        await streamMarkdownText(proseEl, responseText);
+        if (!activePatient) return;
 
         const places = (data.places || []).slice(0, 4).map((p) => p.name);
         const brands = (data.brands || []).slice(0, 4).map((b) => b.name);
         const tags = (data.tags || []).slice(0, 4).map((t) => t.name);
 
-        const assistantResponse = {
+        const uniquePlaces = Array.from(new Set(places)).slice(0, 4);
+        const uniqueBrands = Array.from(new Set(brands)).slice(0, 3);
+        const chips = [
+          ...uniquePlaces.map((p) => `<span class="qloo-chip">📍 ${escapeHtml(p)}</span>`),
+          ...uniqueBrands.map((b) => `<span class="qloo-chip">🏷️ ${escapeHtml(b)}</span>`),
+        ].join('');
+
+        if (chips) {
+          const chipRow = document.createElement('div');
+          chipRow.className = 'qloo-chip-row';
+          chipRow.style.cssText = 'margin-top:14px;padding-top:10px;border-top:1px solid var(--border-subtle);';
+          chipRow.innerHTML = chips;
+          bubble.appendChild(chipRow);
+        }
+
+        CHAT_HISTORY[activePatient.id].push({
           role: 'assistant',
           patientName: activePatient.name,
           location: activePatient.location,
           thoughtProcess: data.thoughtProcess || null,
-          text: data.text || data.analysis || '',
+          text: responseText,
           places,
           brands,
           tags,
-        };
-
-        CHAT_HISTORY[activePatient.id].push(assistantResponse);
-        const el = document.getElementById(tempId);
-        if (el) el.remove();
-        renderChatThread();
+        });
       } catch (err) {
-        const el = document.getElementById(tempId);
-        if (el) {
-          el.innerHTML = `
-            <div class="assistant-bubble">
-              <p style="color:#E57373;">Error connecting to Qloo API: ${escapeHtml(err.message)}</p>
-            </div>
+        const bubble = typingEl.querySelector('.assistant-bubble');
+        if (bubble) {
+          bubble.innerHTML = `
+            <p style="color:#E57373;font-size:13px;line-height:1.5;">Error connecting to Qloo API: ${escapeHtml(err.message)}</p>
           `;
         }
+      } finally {
+        sendBtn.disabled = false;
+        promptInput.disabled = false;
+        promptInput.focus();
       }
     }
 
