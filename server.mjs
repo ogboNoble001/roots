@@ -98,6 +98,9 @@ async function queryGeminiClinicalReasoning(patient, message, qlooData) {
 // Extract dynamic search topics from user queries
 function extractDynamicQueryTopic(message, defaultTag = 'food') {
   const m = (message || '').toLowerCase();
+  if (/maternal|pregnant|pregnancy|antenatal|birth|baby|infant|health\s*care|clinic|hospital|doctor|delivery|maternity/i.test(m)) {
+    return 'hospital';
+  }
   if (/hygiene|clean|sanitation|safety|wash|spoil|storage|bacteria|microb/i.test(m)) {
     return 'hygiene';
   }
@@ -146,6 +149,11 @@ CRITICAL ANALYTICAL BOUNDARIES:
 2. DIVERSE SOCIOECONOMIC SPECTRUM: Reflect realistic local realities. For example, do not assume everyone shops at high-end supermarkets (like SPAR); acknowledge that many residents source fresh food and produce from local neighborhood open-air markets, roadside stalls, and corner patent medicine stores (chemists).
 3. NO RELIGIOUS OR SOCIAL ASSUMPTIONS: Do not speculate about personal religious attendance, church fellowship, or spiritual activities. Stick strictly to physical, environmental, dietary, and consumer facts.
 4. ZERO MEDICAL LECTURING OR DIAGNOSIS: Never guess or diagnose pathologies, diseases, or physiological damage (do NOT use terms like "gastric erosion", "mucosal damage", "systemic vascular resistance", or "metabolic dysregulation"). Dr. Aryta is the physician and already understands clinical medicine. Your job is exclusively objective lifestyle, diet, transit, and consumer habits.
+5. STRICT MANDATE ON REAL PROPER NOUNS & EXACT NAMES:
+Never use vague, generic abstractions like "a network of public health centers", "private clinics within the metropolis", "local food spots", or "fresh food markets". You MUST explicitly name the real-world institutions, hospitals, maternity homes, markets, streets, and clinics by their actual proper nouns:
+- In Enugu / Independence Layout: explicitly name real facilities (e.g. ESUT Teaching Hospital / Parklane along the GRA border, Niger Foundation Hospital on Presidential Rd, Mother of Christ Maternity Hospital, Independence Layout Primary Health Centre, Eastern Nigeria Medical Centre). Name real markets and roads (Kenyatta Market, Ogbete Main Market, Bisalla Rd, Ogui Rd, Ntachi-Osa).
+- In Southwest Houston: explicitly name real facilities (e.g. Memorial Hermann Southwest Hospital on Beechnut, St. Luke's Health Sugar Land, Harris Health clinics along Bellaire/Bissonnet, Alief Community Health Center). Name real markets and corridors (Wazobia African Market, Southwest Farmers Market, Bissonnet St, I-69).
+- In Koreatown / Los Angeles: explicitly name real facilities (e.g. CHA Hollywood Presbyterian Medical Center, KHEIR Community Clinic on 6th St, Good Samaritan Hospital / PIH Health, Cedars-Sinai Medical Center). Name real markets (H Mart Koreatown, Galleria Market on Olympic Blvd, Wilshire corridor).
 
 GROUNDING SIGNALS FROM QLOO TASTE GRAPH FOR THIS TOPIC:
 - Regional Venues & Hubs: ${placesList || 'Not specified'}
@@ -166,12 +174,8 @@ Structure into three detailed sections:
 CRITICAL INSTRUCTION FOR FOLLOW-UP:
 - Answer ONLY Dr. Aryta's specific question: "${message}".
 - DO NOT circle back to or repeat generic baseline profile bullets (such as Maggi cubes, swallow meals, or herbal bitters) unless the question specifically asked about them!
-- For example, if Dr. Aryta asks about "hygiene practices", describe the ACTUAL hygiene and sanitation realities in ${patient.location} for this demographic cohort:
-  * Water supply and safety (treated municipal tap vs. filtration pitchers vs. borehole vs. sachet water).
-  * Food preparation and storage hygiene (refrigeration consistency during power outages or heat, raw meat temperature control at butcher/suya stands, cross-contamination, produce hot-water/salt washing).
-  * Environmental and market sanitation (open stalls, road dust exposure on displayed food, pest control).
-- Ground your answer strictly in ${patient.location} for this demographic (${cohort}).
-- Provide a substantive, detailed answer (~130-180 words) without medical lecturing or diagnosing.`}
+- ALWAYS NAME THE EXACT REAL-WORLD INSTITUTIONS, HOSPITALS, MARKETS, AND STREETS by their proper nouns. Never use generic filler like "a network of clinics" or "health centers".
+- Provide a substantive, detailed, and practically grounded answer (~130-180 words) without medical lecturing or diagnosing.`}
 
 Output only the markdown text.`;
 
