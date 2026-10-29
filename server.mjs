@@ -28,7 +28,7 @@ loadEnv();
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, 'public');
-const QLOO_API_KEY = process.env.QLOO_API_KEY || 'hack_79608ef0cbb3f7d7c60a9d6dee03ac2d6cf6deef';
+const QLOO_API_KEY = process.env.QLOO_API_KEY || '';
 const QLOO_BASE_URL = process.env.QLOO_API_BASE_URL || 'https://hackathon.api.qloo.com';
 
 const GEMINI_KEYS = (process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '')
@@ -66,7 +66,7 @@ async function fetchQlooEndpoint(endpointPath, params = {}) {
   });
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+  const timeout = setTimeout(() => controller.abort(), 25000);
 
   try {
     const response = await fetch(url.toString(), {
@@ -321,7 +321,14 @@ const server = http.createServer(async (req, res) => {
   // Full Agentic Chat Endpoint (Qloo Graph Grounding + Gemini 2.5 Flash Reasoning)
   if (reqUrl.pathname === '/api/roots/chat' && req.method === 'POST') {
     let body = '';
-    req.on('data', (chunk) => (body += chunk));
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 1e6) {
+        res.writeHead(413, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: 'Payload too large' }));
+        req.destroy();
+      }
+    });
     req.on('end', async () => {
       try {
         const payload = JSON.parse(body || '{}');

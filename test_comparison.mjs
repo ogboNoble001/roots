@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const QLOO_API_KEY = 'hack_79608ef0cbb3f7d7c60a9d6dee03ac2d6cf6deef';
+const QLOO_API_KEY = process.env.QLOO_API_KEY || '';
 const QLOO_BASE_URL = 'https://hackathon.api.qloo.com';
 
 const envText = fs.readFileSync('.env.local', 'utf8');

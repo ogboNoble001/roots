@@ -174,10 +174,10 @@ roots/
 
 ## 👥 Cohort Case Studies
 
-* **Chinedu Okafor (PT-2041):** 44-year-old male residing in Independence Layout, Enugu. Evaluated for recurrent dyspepsia and lifestyle factors. Qloo surfaces dietary reliance on *Oha soup*, *Bitter leaf soup*, and fresh markets along *Chime Avenue*.
-* **Tanya Adams (PT-2038):** 52-year-old female in Sharpstown, Houston. Evaluated for metabolic management, transit stress along the *I-69 corridor*, and local grocery access.
-* **Mariam Lawal (PT-2035):** 29-year-old female in Gulfton, Houston. Evaluated for maternal health and environmental water/commute patterns.
-* **Adaeze Nwosu (PT-2029):** 36-year-old female in Independence Layout, Enugu. Evaluated for antenatal lifestyle guidance, local primary health centres, and high-protein local staples.
+* **Chinedu Okafor (PT-2041):** 19-year-old male, New Haven, Enugu City, Nigeria — 200L Engineering Student & 5-Aside Footballer. Evaluated for acute lower-right abdominal pain. Qloo intelligence cross-references athletic turf jarring on bumpy New Haven roads vs. favorite local staples (*Morning Okpa*, *Abacha*, *roadside Shawarma*).
+* **Tunde Adeyemi (PT-2038):** 46-year-old male, Southwest Houston, TX — Senior Operations Manager facing a 90-min daily commute. Evaluated for nocturnal acid reflux and morning headaches. Qloo maps late-night heavy swallow meals, high bouillon cube seasoning loads, and after-work herbal bitters with OTC NSAIDs.
+* **Maya Lin (PT-2035):** 23-year-old female, Koreatown, Los Angeles, CA — Junior UX Designer & Night Student. Evaluated for heart palpitations and hand tremors. Qloo surfaces late-night K-Town study cafe habits (ceremonial iced matcha blocking oral iron absorption) and high-caffeine functional energy cans before workouts.
+* **Amara Nwosu (PT-2029):** 64-year-old female, Independence Layout, Enugu, Nigeria — Retired Principal & Church Leader. Evaluated for epigastric burning and knee osteoarthritis. Qloo analyzes bi-weekly church fasting routines paired with taking NSAIDs on an empty stomach and acidic ginger/lemon teas.
 
 ---
 
