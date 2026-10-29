@@ -76,7 +76,7 @@ export async function POST(request) {
       id: t.tag_id || t.id,
     }));
 
-    const rawOutput = await queryGeminiClinicalReasoning(patient, message, {
+    const { text: rawOutput, error: aiError } = await queryGeminiClinicalReasoning(patient, message, {
       places: fullQlooPlaces,
       brands,
       tags,
@@ -93,7 +93,7 @@ export async function POST(request) {
 
     if (!text) {
       return Response.json(
-        { success: false, error: 'The AI did not respond. Please try again.' },
+        { success: false, error: aiError || 'The AI did not respond. Please try again.' },
         { status: 502 }
       );
     }
