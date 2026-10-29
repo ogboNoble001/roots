@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "node server.mjs",
+    "start": "node server.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.454.0",

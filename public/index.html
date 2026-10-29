@@ -757,6 +757,56 @@
       z-index: 15;
     }
 
+    /* Quick Clinical Probe Pills */
+    .quick-probe-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+      overflow-x: auto;
+      padding: 2px 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .quick-probe-row::-webkit-scrollbar {
+      display: none;
+    }
+    .quick-probe-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+      margin-right: 2px;
+    }
+    .quick-probe-pill {
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9999px;
+      padding: 5px 12px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .quick-probe-pill:hover {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+    .quick-probe-pill:active {
+      transform: translateY(0);
+    }
+
     .composer-card {
       width: 100%;
       background-color: var(--surface-card);
@@ -1491,6 +1541,14 @@
 
         <!-- Composer Card Container -->
         <div class="composer-container" id="composerContainer">
+          <!-- Quick Clinical Probes -->
+          <div class="quick-probe-row" id="quickProbeRow" style="display: none;">
+            <span class="quick-probe-label">Probe:</span>
+            <button type="button" class="quick-probe-pill" data-probe="Tell me about their local dishes, staples, and dietary intake based on Qloo taste intelligence.">🍽️ Local dishes & diet</button>
+            <button type="button" class="quick-probe-pill" data-probe="Assess household hygiene, sanitation patterns, and drinking water sources in their neighborhood.">💧 Hygiene & water</button>
+            <button type="button" class="quick-probe-pill" data-probe="Analyze daily transit, commute exposure, traffic bottlenecks, and mobility options.">🚗 Transit & mobility</button>
+            <button type="button" class="quick-probe-pill" data-probe="Detail fresh food sourcing, local markets, and neighborhood butcher/grocer availability.">🛒 Sourcing & markets</button>
+          </div>
           <div class="composer-card">
             <textarea
               id="promptInput"
@@ -1773,6 +1831,7 @@
     const heroGreeting = document.getElementById('heroGreeting');
     const chatThread = document.getElementById('chatThread');
     const composerContainer = document.getElementById('composerContainer');
+    const quickProbeRow = document.getElementById('quickProbeRow');
     const promptInput = document.getElementById('promptInput');
     const sendBtn = document.getElementById('sendBtn');
     const headerChatTitle = document.getElementById('headerChatTitle');
@@ -2023,6 +2082,7 @@
       chatThread.classList.remove('visible');
       chatThread.innerHTML = '';
       composerContainer.classList.remove('docked-bottom');
+      if (quickProbeRow) quickProbeRow.style.display = 'none';
 
       headerChatTitle.classList.remove('visible');
       headerChatTitle.textContent = '';
@@ -2137,6 +2197,7 @@
         heroGreeting.classList.add('hidden');
         chatThread.classList.add('visible');
         composerContainer.classList.add('docked-bottom');
+        if (quickProbeRow) quickProbeRow.style.display = 'flex';
         promptInput.placeholder = `Ask about ${patient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
         chatThread.innerHTML = '';
 
@@ -2215,6 +2276,7 @@
       heroGreeting.classList.add('hidden');
       chatThread.classList.add('visible');
       composerContainer.classList.add('docked-bottom');
+      if (quickProbeRow) quickProbeRow.style.display = 'flex';
       promptInput.placeholder = `Ask about ${patient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
 
       let assistantRow = existingRow;
@@ -2317,6 +2379,7 @@
       heroGreeting.classList.add('hidden');
       chatThread.classList.add('visible');
       composerContainer.classList.add('docked-bottom');
+      if (quickProbeRow) quickProbeRow.style.display = 'flex';
       promptInput.placeholder = `Ask about ${activePatient.name.split(' ')[0]}'s diet, food, or lifestyle...`;
 
       chatThread.innerHTML = history
@@ -2540,6 +2603,16 @@
         e.preventDefault();
         handleSendMessage();
       }
+    });
+
+    // Quick Clinical Probe Pill Click Handlers
+    document.querySelectorAll('.quick-probe-pill').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const probe = btn.getAttribute('data-probe');
+        if (probe) {
+          handleSendMessage(probe);
+        }
+      });
     });
 
     // Toggle [ Chat | Details ]
